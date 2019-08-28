@@ -666,6 +666,46 @@ paths:
       summary: Send an email from a random email address
       tags:
       - Common Operations
+  /waitForNthEmail:
+    get:
+      deprecated: false
+      operationId: waitForNthEmail
+      parameters:
+      - allowEmptyValue: false
+        description: Id of the inbox we are fetching emails from
+        in: query
+        name: inboxId
+        schema:
+          format: uuid
+          type: string
+      - allowEmptyValue: false
+        description: Zero based index of the email to wait for
+        in: query
+        name: index
+        schema:
+          format: int32
+          type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Email'
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Wait for or fetch the email with a given index in the inbox specified
+      tags:
+      - Common Operations
 components:
   schemas:
     BulkSendEmailOptions:
