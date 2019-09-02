@@ -1,0 +1,1054 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: contact@mailslurp.dev
+    name: MailSlurp
+    url: https://www.mailslurp.com
+  description: For documentation see [developer guide](https://www.mailslurp.com/developers). [Create an account](https://app.mailslurp.com) in the MailSlurp Dashboard to [view your API Key](https://app). For all bugs, feature requests, or help please [see support](https://www.mailslurp.com/support/).
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: MailSlurp API
+  version: 0.0.1-alpha
+servers:
+- url: https://api.mailslurp.com/
+tags:
+- description: Create email addresses, send emails, and receive them
+  name: Common Operations
+- description: Other endpoints including advanced receive options
+  name: Extra Operations
+paths:
+  /bulk/inboxes:
+    delete:
+      deprecated: false
+      description: Enterprise Plan Required
+      operationId: bulkDeleteInboxes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                format: uuid
+                type: string
+              type: array
+        description: ids
+        required: true
+      responses:
+        204:
+          content: {}
+          description: No Content
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+      security:
+      - API_KEY: []
+      summary: Bulk Delete Inboxes
+      tags:
+      - Extra Operations
+    post:
+      deprecated: false
+      description: Enterprise Plan Required
+      operationId: bulkCreateInboxes
+      parameters:
+      - allowEmptyValue: false
+        description: Number of inboxes to be created in bulk
+        in: query
+        name: count
+        required: true
+        schema:
+          format: int32
+          type: integer
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Inbox'
+                type: array
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Bulk create Inboxes (email addresses)
+      tags:
+      - Extra Operations
+  /bulk/send:
+    post:
+      deprecated: false
+      description: Enterprise Plan Required
+      operationId: bulkSendEmails
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkSendEmailOptions'
+        description: bulkSendEmailOptions
+        required: true
+      responses:
+        201:
+          content: {}
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Bulk Send Emails
+      tags:
+      - Extra Operations
+  /deleteEmailAddress:
+    delete:
+      deprecated: false
+      description: Deletes an inbox
+      operationId: deleteEmailAddress
+      parameters:
+      - description: inboxId
+        in: query
+        name: inboxId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        204:
+          content: {}
+          description: No Content
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        410:
+          content: {}
+          description: Gone
+      security:
+      - API_KEY: []
+      summary: Delete email address and its emails
+      tags:
+      - Common Operations
+  /emails/{emailId}:
+    delete:
+      deprecated: false
+      description: Deletes an email and removes it from the inbox
+      operationId: deleteEmail
+      parameters:
+      - description: emailId
+        in: path
+        name: emailId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        204:
+          content: {}
+          description: No Content
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+      security:
+      - API_KEY: []
+      summary: Delete Email
+      tags:
+      - Extra Operations
+    get:
+      deprecated: false
+      description: Returns a email summary object with headers and content. To retrieve the raw unparsed email use the getRawMessage endpoint
+      operationId: getEmail
+      parameters:
+      - description: emailId
+        in: path
+        name: emailId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Email'
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get Email Content
+      tags:
+      - Extra Operations
+  /emails/{emailId}/attachments/{attachmentId}:
+    get:
+      deprecated: false
+      description: Returns the specified attachment for a given email as a byte stream (file download). Get the attachmentId from the email response. Requires enterprise account.
+      operationId: downloadAttachment
+      parameters:
+      - description: attachmentId
+        in: path
+        name: attachmentId
+        required: true
+        schema:
+          type: string
+      - description: emailId
+        in: path
+        name: emailId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content: {}
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get email attachment
+      tags:
+      - Extra Operations
+  /emails/{emailId}/raw:
+    get:
+      deprecated: false
+      description: Returns a raw, unparsed and unprocessed email
+      operationId: getRawEmailContents
+      parameters:
+      - description: emailId
+        in: path
+        name: emailId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get Raw Email Content
+      tags:
+      - Extra Operations
+  /fetchLatestEmail:
+    get:
+      deprecated: false
+      description: Will return either the last received email or wait for an email to arrive and return that. If you need to wait for an email for a non-empty inbox see the other receive methods.
+      operationId: waitForLatestEmail
+      parameters:
+      - allowEmptyValue: false
+        description: Email address of the inbox we are fetching emails from
+        in: query
+        name: inboxEmailAddress
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: Id of the inbox we are fetching emails from
+        in: query
+        name: inboxId
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Email'
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Fetch inbox's latest email or if empty wait for email to arrive
+      tags:
+      - Common Operations
+  /inboxes:
+    get:
+      deprecated: false
+      description: List the inboxes you have created
+      operationId: getInboxes
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Inbox'
+                type: array
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: List Inboxes / Email Addresses
+      tags:
+      - Extra Operations
+    post:
+      deprecated: false
+      description: Create a new inbox and ephemeral email address to send and receive from. This is a necessary step before sending or receiving emails. The response contains the inbox's ID and its associated email address. It is recommended that you create a new inbox during each test method so that it is unique and empty
+      operationId: createInbox
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbox'
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Create an Inbox (email address)
+      tags:
+      - Extra Operations
+  /inboxes/{inboxId}:
+    delete:
+      deprecated: false
+      description: Permanently delete an inbox and associated email address
+      operationId: deleteInbox
+      parameters:
+      - description: inboxId
+        in: path
+        name: inboxId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        204:
+          content: {}
+          description: No Content
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+      security:
+      - API_KEY: []
+      summary: Delete Inbox / Email Address
+      tags:
+      - Extra Operations
+    get:
+      deprecated: false
+      description: Returns an inbox's properties, including its email address and ID.
+      operationId: getInbox
+      parameters:
+      - description: inboxId
+        in: path
+        name: inboxId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbox'
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get Inbox / EmailAddress
+      tags:
+      - Extra Operations
+    post:
+      deprecated: false
+      description: Send an email from the inbox's email address. Specify the email recipients and contents in the request body. See the `SendEmailOptions` for more information. Note the `inboxId` refers to the inbox's id NOT its email address
+      operationId: sendEmail
+      parameters:
+      - description: inboxId
+        in: path
+        name: inboxId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailOptions'
+        description: sendEmailOptions
+        required: true
+      responses:
+        201:
+          content: {}
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Send Email
+      tags:
+      - Extra Operations
+  /inboxes/{inboxId}/emails:
+    get:
+      deprecated: false
+      description: List emails that an inbox has received. Only emails that are sent to the inbox's email address will appear in the inbox. It may take several seconds for any email you send to an inbox's email address to appear in the inbox. To make this endpoint wait for a minimum number of emails use the `minCount` parameter. The server will retry the inbox database until the `minCount` is satisfied or the `retryTimeout` is reached
+      operationId: getEmails
+      parameters:
+      - description: Id of inbox that emails belongs to
+        in: path
+        name: inboxId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - allowEmptyValue: false
+        description: Limit the result set, ordered by descending received date time
+        in: query
+        name: limit
+        schema:
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Minimum acceptable email count. Will cause request to hang (and retry) until minCount is satisfied or retryTimeout is reached.
+        in: query
+        name: minCount
+        schema:
+          format: int64
+          type: integer
+      - allowEmptyValue: false
+        description: Maximum milliseconds to spend retrying inbox database until minCount emails are returned
+        in: query
+        name: retryTimeout
+        schema:
+          format: int64
+          type: integer
+      - allowEmptyValue: false
+        description: Exclude emails received before this ISO 8601 date time
+        in: query
+        name: since
+        schema:
+          format: date-time
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EmailPreview'
+                type: array
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: List Emails in an Inbox / EmailAddress
+      tags:
+      - Extra Operations
+  /inboxes/{inboxId}/webhooks:
+    get:
+      deprecated: false
+      operationId: getWebhooks
+      parameters:
+      - description: inboxId
+        in: path
+        name: inboxId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Webhook'
+                type: array
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get all WebHooks for an Inbox
+      tags:
+      - Extra Operations
+    post:
+      deprecated: false
+      description: Get notified whenever an inbox receives an email via a WebHook URL. An emailID will be posted to this URL every time an email is received for this inbox. The URL must be publicly reachable by the MailSlurp server. You can provide basicAuth values if you wish to secure this endpoint.
+      operationId: createWebhook
+      parameters:
+      - description: inboxId
+        in: path
+        name: inboxId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookOptions'
+        description: webhookOptions
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Attach a WebHook URL to an inbox
+      tags:
+      - Extra Operations
+  /inboxes/{inboxId}/webhooks/{webhookId}:
+    delete:
+      deprecated: false
+      operationId: deleteWebhook
+      parameters:
+      - description: inboxId
+        in: path
+        name: inboxId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: webhookId
+        in: path
+        name: webhookId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        204:
+          content: {}
+          description: No Content
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+      security:
+      - API_KEY: []
+      summary: Delete and disable a WebHook for an Inbox
+      tags:
+      - Extra Operations
+  /newEmailAddress:
+    post:
+      deprecated: false
+      description: Returns an Inbox with an `id` and an `emailAddress`
+      operationId: createNewEmailAddress
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbox'
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Create new email address
+      tags:
+      - Common Operations
+  /sendEmail:
+    post:
+      deprecated: false
+      description: To specify an email address first create an inbox and use that with the other send email methods
+      operationId: sendEmailSimple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailOptions'
+        description: sendEmailOptions
+        required: true
+      responses:
+        201:
+          content: {}
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Send an email from a random email address
+      tags:
+      - Common Operations
+  /waitForNthEmail:
+    get:
+      deprecated: false
+      operationId: waitForNthEmail
+      parameters:
+      - allowEmptyValue: false
+        description: Id of the inbox we are fetching emails from
+        in: query
+        name: inboxId
+        schema:
+          format: uuid
+          type: string
+      - allowEmptyValue: false
+        description: Zero based index of the email to wait for
+        in: query
+        name: index
+        schema:
+          format: int32
+          type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Email'
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Wait for or fetch the email with a given index in the inbox specified
+      tags:
+      - Common Operations
+components:
+  schemas:
+    BulkSendEmailOptions:
+      description: Bulk sending options
+      example:
+        inboxIds:
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        sendEmailOptions:
+          cc:
+          - cc
+          - cc
+          charset: charset
+          bcc:
+          - bcc
+          - bcc
+          subject: subject
+          replyTo: replyTo
+          from: from
+          html: true
+          to:
+          - to
+          - to
+          body: body
+      properties:
+        inboxIds:
+          description: Inboxes to send from
+          items:
+            format: uuid
+            type: string
+          type: array
+        sendEmailOptions:
+          $ref: '#/components/schemas/SendEmailOptions'
+      required:
+      - sendEmailOptions
+      title: BulkSendEmailOptions
+      type: object
+    Email:
+      description: Representation of an email
+      example:
+        cc:
+        - cc
+        - cc
+        headers:
+          key: headers
+        attachments:
+        - attachments
+        - attachments
+        bcc:
+        - bcc
+        - bcc
+        subject: subject
+        analysis:
+          spamVerdict: spamVerdict
+          virusVerdict: virusVerdict
+          dmarcVerdict: dmarcVerdict
+          spfVerdict: spfVerdict
+          dkimVerdict: dkimVerdict
+        body: body
+        userId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        rawUrl: rawUrl
+        from: from
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        to:
+        - to
+        - to
+        inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        analysis:
+          $ref: '#/components/schemas/EmailAnalysis'
+        attachments:
+          items:
+            type: string
+          type: array
+        bcc:
+          items:
+            type: string
+          type: array
+        body:
+          type: string
+        cc:
+          items:
+            type: string
+          type: array
+        createdAt:
+          format: date-time
+          type: string
+        from:
+          type: string
+        headers:
+          additionalProperties:
+            type: string
+          type: object
+        id:
+          format: uuid
+          type: string
+        inboxId:
+          format: uuid
+          type: string
+        rawUrl:
+          type: string
+        subject:
+          type: string
+        to:
+          items:
+            type: string
+          type: array
+        updatedAt:
+          format: date-time
+          type: string
+        userId:
+          format: uuid
+          type: string
+      required:
+      - createdAt
+      - id
+      - inboxId
+      - to
+      - updatedAt
+      - userId
+      title: Email
+      type: object
+    BasicAuthOptions:
+      example:
+        password: password
+        username: username
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - username
+      title: BasicAuthOptions
+      type: object
+    SendEmailOptions:
+      description: Options for sending an email message from an inbox
+      example:
+        cc:
+        - cc
+        - cc
+        charset: charset
+        bcc:
+        - bcc
+        - bcc
+        subject: subject
+        replyTo: replyTo
+        from: from
+        html: true
+        to:
+        - to
+        - to
+        body: body
+      properties:
+        bcc:
+          description: Optional list of bcc destination email addresses
+          items:
+            type: string
+          type: array
+        body:
+          description: Contents of email
+          type: string
+        cc:
+          description: Optional list of cc destination email addresses
+          items:
+            type: string
+          type: array
+        charset:
+          description: Optional charset
+          type: string
+        from:
+          description: Optional from address. If not set source inbox address will be used
+          type: string
+        html:
+          type: boolean
+        replyTo:
+          description: Optional replyTo header
+          type: string
+        subject:
+          description: Optional email subject line
+          type: string
+        to:
+          description: List of destination email addresses. Even single recipients must be in array form.
+          items:
+            type: string
+          type: array
+      required:
+      - to
+      title: SendEmailOptions
+      type: object
+    CreateWebhookOptions:
+      example:
+        basicAuth:
+          password: password
+          username: username
+        name: name
+        url: url
+      properties:
+        basicAuth:
+          $ref: '#/components/schemas/BasicAuthOptions'
+        url:
+          description: Public URL (including protocol) that MailSlurp can post WebhookNotificationObjects to when an email is received
+          type: string
+        name:
+          type: string
+      title: CreateWebhookOptions
+      type: object
+    Webhook:
+      description: Representation of a webhook for an inbox.
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        basicAuth: true
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        basicAuth:
+          description: Does Webhook expect basic authentication
+          type: boolean
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          description: ID of the Webhook
+          format: uuid
+          type: string
+        inboxId:
+          description: The inbox that the Webhook will be triggered by
+          format: uuid
+          type: string
+        name:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+      - createdAt
+      - updatedAt
+      title: Webhook
+      type: object
+    EmailPreview:
+      description: Preview of an email message. For full message call the message endpoint with a given message id.
+      example:
+        created: 2000-01-23T04:56:07.000+00:00
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        created:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+      required:
+      - created
+      - id
+      title: EmailPreview
+      type: object
+    EmailAnalysis:
+      description: Analysis of email
+      example:
+        spamVerdict: spamVerdict
+        virusVerdict: virusVerdict
+        dmarcVerdict: dmarcVerdict
+        spfVerdict: spfVerdict
+        dkimVerdict: dkimVerdict
+      properties:
+        dkimVerdict:
+          type: string
+        dmarcVerdict:
+          type: string
+        spamVerdict:
+          type: string
+        spfVerdict:
+          type: string
+        virusVerdict:
+          type: string
+      required:
+      - dkimVerdict
+      - dmarcVerdict
+      - spamVerdict
+      - spfVerdict
+      - virusVerdict
+      title: EmailAnalysis
+      type: object
+    Inbox:
+      description: Representation of an inbox with an email address. Emails can be sent to or from this email address.
+      example:
+        emailAddress: emailAddress
+        created: 2000-01-23T04:56:07.000+00:00
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        userId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        created:
+          format: date-time
+          type: string
+        emailAddress:
+          description: The inbox's email address. Send an email to this address and the inbox will receive it
+          type: string
+        id:
+          format: uuid
+          type: string
+        userId:
+          format: uuid
+          type: string
+      title: Inbox
+      type: object
+  securitySchemes:
+    API_KEY:
+      in: header
+      name: x-api-key
+      type: apiKey
