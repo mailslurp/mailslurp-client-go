@@ -499,7 +499,7 @@ Deletes an email and removes it from the inbox
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param emailId emailId
 */
-func (a *ExtraOperationsApiService) DeleteEmail(ctx context.Context, emailId string) (*http.Response, error) {
+func (a *ExtraOperationsApiService) DeleteEmail1(ctx context.Context, emailId string) (*http.Response, error) {
 	var (
 		localVarHttpMethod   = strings.ToUpper("Delete")
 		localVarPostBody     interface{}

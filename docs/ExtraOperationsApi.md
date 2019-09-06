@@ -9,7 +9,7 @@ Method | HTTP request | Description
 [**BulkSendEmails**](ExtraOperationsApi.md#BulkSendEmails) | **Post** /bulk/send | Bulk Send Emails
 [**CreateInbox**](ExtraOperationsApi.md#CreateInbox) | **Post** /inboxes | Create an Inbox (email address)
 [**CreateWebhook**](ExtraOperationsApi.md#CreateWebhook) | **Post** /inboxes/{inboxId}/webhooks | Attach a WebHook URL to an inbox
-[**DeleteEmail**](ExtraOperationsApi.md#DeleteEmail) | **Delete** /emails/{emailId} | Delete Email
+[**DeleteEmail1**](ExtraOperationsApi.md#DeleteEmail1) | **Delete** /emails/{emailId} | Delete Email
 [**DeleteInbox**](ExtraOperationsApi.md#DeleteInbox) | **Delete** /inboxes/{inboxId} | Delete Inbox / Email Address
 [**DeleteWebhook**](ExtraOperationsApi.md#DeleteWebhook) | **Delete** /inboxes/{inboxId}/webhooks/{webhookId} | Delete and disable a WebHook for an Inbox
 [**DownloadAttachment**](ExtraOperationsApi.md#DownloadAttachment) | **Get** /emails/{emailId}/attachments/{attachmentId} | Get email attachment
@@ -159,8 +159,8 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **DeleteEmail**
-> DeleteEmail(ctx, emailId)
+# **DeleteEmail1**
+> DeleteEmail1(ctx, emailId)
 Delete Email
 
 Deletes an email and removes it from the inbox
