@@ -142,7 +142,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
   **inboxId** | [**string**](.md)| inboxId | 
-  **createWebhookOptions** | [**CreateWebhookOptions**](CreateWebhookOptions.md)| options | 
+  **createWebhookOptions** | [**CreateWebhookOptions**](CreateWebhookOptions.md)| webhookOptions | 
 
 ### Return type
 

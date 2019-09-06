@@ -394,7 +394,7 @@ ExtraOperationsApiService Attach a WebHook URL to an inbox
 Get notified whenever an inbox receives an email via a WebHook URL. An emailID will be posted to this URL every time an email is received for this inbox. The URL must be publicly reachable by the MailSlurp server. You can provide basicAuth values if you wish to secure this endpoint.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param inboxId inboxId
- * @param createWebhookOptions options
+ * @param createWebhookOptions webhookOptions
 @return Webhook
 */
 func (a *ExtraOperationsApiService) CreateWebhook(ctx context.Context, inboxId string, createWebhookOptions CreateWebhookOptions) (Webhook, *http.Response, error) {

@@ -606,7 +606,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateWebhookOptions'
-        description: options
+        description: webhookOptions
         required: true
       responses:
         201:
