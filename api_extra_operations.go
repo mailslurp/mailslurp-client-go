@@ -1533,16 +1533,16 @@ ExtraOperationsApiService Upload an attachment for sending
 When sending emails with attachments first upload each attachment with this endpoint. Record the returned attachment IDs. Then use these attachment IDs in the SendEmailOptions when sending an email. This means that attachments can easily be reused.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param uploadAttachmentOptions uploadOptions
-@return string
+@return []string
 */
-func (a *ExtraOperationsApiService) UploadAttachment(ctx context.Context, uploadAttachmentOptions UploadAttachmentOptions) (string, *http.Response, error) {
+func (a *ExtraOperationsApiService) UploadAttachment(ctx context.Context, uploadAttachmentOptions UploadAttachmentOptions) ([]string, *http.Response, error) {
 	var (
 		localVarHttpMethod   = strings.ToUpper("Post")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  string
+		localVarReturnValue  []string
 	)
 
 	// create path and map variables
@@ -1606,7 +1606,7 @@ func (a *ExtraOperationsApiService) UploadAttachment(ctx context.Context, upload
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 201 {
-			var v string
+			var v []string
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -1638,7 +1638,7 @@ When sending emails with attachments first upload each attachment with this endp
  * @param optional nil or *UploadMultipartFormOpts - Optional Parameters:
  * @param "ContentType" (optional.String) -  contentType
  * @param "Filename" (optional.String) -  filename
-@return string
+@return []string
 */
 
 type UploadMultipartFormOpts struct {
@@ -1646,14 +1646,14 @@ type UploadMultipartFormOpts struct {
 	Filename optional.String
 }
 
-func (a *ExtraOperationsApiService) UploadMultipartForm(ctx context.Context, file *os.File, localVarOptionals *UploadMultipartFormOpts) (string, *http.Response, error) {
+func (a *ExtraOperationsApiService) UploadMultipartForm(ctx context.Context, file *os.File, localVarOptionals *UploadMultipartFormOpts) ([]string, *http.Response, error) {
 	var (
 		localVarHttpMethod   = strings.ToUpper("Post")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  string
+		localVarReturnValue  []string
 	)
 
 	// create path and map variables
@@ -1729,7 +1729,7 @@ func (a *ExtraOperationsApiService) UploadMultipartForm(ctx context.Context, fil
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 201 {
-			var v string
+			var v []string
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()

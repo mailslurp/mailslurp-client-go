@@ -477,7 +477,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **UploadAttachment**
-> string UploadAttachment(ctx, uploadAttachmentOptions)
+> []string UploadAttachment(ctx, uploadAttachmentOptions)
 Upload an attachment for sending
 
 When sending emails with attachments first upload each attachment with this endpoint. Record the returned attachment IDs. Then use these attachment IDs in the SendEmailOptions when sending an email. This means that attachments can easily be reused.
@@ -491,7 +491,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**string**
+**[]string**
 
 ### Authorization
 
@@ -505,7 +505,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **UploadMultipartForm**
-> string UploadMultipartForm(ctx, file, optional)
+> []string UploadMultipartForm(ctx, file, optional)
 Upload an attachment for sending using Multipart Form
 
 When sending emails with attachments first upload each attachment with this endpoint. Record the returned attachment IDs. Then use these attachment IDs in the SendEmailOptions when sending an email. This means that attachments can easily be reused.
@@ -529,7 +529,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**string**
+**[]string**
 
 ### Authorization
 
