@@ -9,7 +9,7 @@ Method | HTTP request | Description
 [**BulkSendEmails**](ExtraOperationsApi.md#BulkSendEmails) | **Post** /bulk/send | Bulk Send Emails
 [**CreateInbox**](ExtraOperationsApi.md#CreateInbox) | **Post** /inboxes | Create an Inbox (email address)
 [**CreateWebhook**](ExtraOperationsApi.md#CreateWebhook) | **Post** /inboxes/{inboxId}/webhooks | Attach a WebHook URL to an inbox
-[**DeleteEmail**](ExtraOperationsApi.md#DeleteEmail) | **Delete** /emails/{emailId} | Delete Email
+[**DeleteEmail1**](ExtraOperationsApi.md#DeleteEmail1) | **Delete** /emails/{emailId} | Delete Email
 [**DeleteInbox**](ExtraOperationsApi.md#DeleteInbox) | **Delete** /inboxes/{inboxId} | Delete Inbox / Email Address
 [**DeleteWebhook**](ExtraOperationsApi.md#DeleteWebhook) | **Delete** /inboxes/{inboxId}/webhooks/{webhookId} | Delete and disable a WebHook for an Inbox
 [**DownloadAttachment**](ExtraOperationsApi.md#DownloadAttachment) | **Get** /emails/{emailId}/attachments/{attachmentId} | Get email attachment
@@ -20,6 +20,8 @@ Method | HTTP request | Description
 [**GetRawEmailContents**](ExtraOperationsApi.md#GetRawEmailContents) | **Get** /emails/{emailId}/raw | Get Raw Email Content
 [**GetWebhooks**](ExtraOperationsApi.md#GetWebhooks) | **Get** /inboxes/{inboxId}/webhooks | Get all WebHooks for an Inbox
 [**SendEmail**](ExtraOperationsApi.md#SendEmail) | **Post** /inboxes/{inboxId} | Send Email
+[**UploadAttachment**](ExtraOperationsApi.md#UploadAttachment) | **Post** /attachments | Upload an attachment for sending
+[**UploadMultipartForm**](ExtraOperationsApi.md#UploadMultipartForm) | **Post** /attachments/multipart | Upload an attachment for sending using Multipart Form
 
 
 # **BulkCreateInboxes**
@@ -159,8 +161,8 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **DeleteEmail**
-> DeleteEmail(ctx, emailId)
+# **DeleteEmail1**
+> DeleteEmail1(ctx, emailId)
 Delete Email
 
 Deletes an email and removes it from the inbox
@@ -471,6 +473,72 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: application/json
  - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **UploadAttachment**
+> string UploadAttachment(ctx, uploadAttachmentOptions)
+Upload an attachment for sending
+
+When sending emails with attachments first upload each attachment with this endpoint. Record the returned attachment IDs. Then use these attachment IDs in the SendEmailOptions when sending an email. This means that attachments can easily be reused.
+
+### Required Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+  **uploadAttachmentOptions** | [**UploadAttachmentOptions**](UploadAttachmentOptions.md)| uploadOptions | 
+
+### Return type
+
+**string**
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **UploadMultipartForm**
+> string UploadMultipartForm(ctx, file, optional)
+Upload an attachment for sending using Multipart Form
+
+When sending emails with attachments first upload each attachment with this endpoint. Record the returned attachment IDs. Then use these attachment IDs in the SendEmailOptions when sending an email. This means that attachments can easily be reused.
+
+### Required Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+  **file** | ***os.File*****os.File**| file | 
+ **optional** | ***UploadMultipartFormOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+Optional parameters are passed through a pointer to a UploadMultipartFormOpts struct
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **contentType** | **optional.String**| contentType | 
+ **filename** | **optional.String**| filename | 
+
+### Return type
+
+**string**
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+ - **Content-Type**: multipart/form-data
+ - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

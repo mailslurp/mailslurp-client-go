@@ -9,16 +9,12 @@
  */
 
 package mailslurp
-import (
-	"time"
-)
 
-// Preview of an email message. For full message call the message endpoint with a given message id.
-type EmailPreview struct {
-	Bcc []string `json:"bcc,omitempty"`
-	Cc []string `json:"cc,omitempty"`
-	Created time.Time `json:"created"`
-	Id string `json:"id"`
-	Subject string `json:"subject,omitempty"`
-	To []string `json:"to"`
+type MatchOption struct {
+	// The email property to match on. One of SUBJECT, TO, BCC, CC or FROM
+	Field string `json:"field,omitempty"`
+	// What criteria to apply. CONTAIN or EQUAL. Note CONTAIN is recommended due to some SMTP servers adding new lines
+	Should string `json:"should,omitempty"`
+	// The value to compare to the field using EQUAL or CONTAIN
+	Value string `json:"value,omitempty"`
 }

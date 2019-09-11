@@ -15,9 +15,91 @@ servers:
 tags:
 - description: Create email addresses, send emails, and receive them
   name: Common Operations
-- description: Other endpoints including advanced receive options
+- description: Endpoints for uploading attachments.
   name: Extra Operations
 paths:
+  /attachments:
+    post:
+      deprecated: false
+      description: When sending emails with attachments first upload each attachment with this endpoint. Record the returned attachment IDs. Then use these attachment IDs in the SendEmailOptions when sending an email. This means that attachments can easily be reused.
+      operationId: uploadAttachment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadAttachmentOptions'
+        description: uploadOptions
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Upload an attachment for sending
+      tags:
+      - Extra Operations
+  /attachments/multipart:
+    post:
+      deprecated: false
+      description: When sending emails with attachments first upload each attachment with this endpoint. Record the returned attachment IDs. Then use these attachment IDs in the SendEmailOptions when sending an email. This means that attachments can easily be reused.
+      operationId: uploadMultipartForm
+      parameters:
+      - description: contentType
+        in: query
+        name: contentType
+        schema:
+          type: string
+      - description: filename
+        in: query
+        name: filename
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  description: file
+                  format: binary
+                  type: string
+              required:
+              - file
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Upload an attachment for sending using Multipart Form
+      tags:
+      - Extra Operations
   /bulk/inboxes:
     delete:
       deprecated: false
@@ -114,6 +196,37 @@ paths:
       summary: Bulk Send Emails
       tags:
       - Extra Operations
+  /deleteEmail:
+    delete:
+      deprecated: false
+      description: Deletes an email
+      operationId: deleteEmail
+      parameters:
+      - description: emailId
+        in: query
+        name: emailId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        204:
+          content: {}
+          description: No Content
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        410:
+          content: {}
+          description: Gone
+      security:
+      - API_KEY: []
+      summary: Delete an email
+      tags:
+      - Common Operations
   /deleteEmailAddress:
     delete:
       deprecated: false
@@ -149,7 +262,7 @@ paths:
     delete:
       deprecated: false
       description: Deletes an email and removes it from the inbox
-      operationId: deleteEmail
+      operationId: deleteEmail_1
       parameters:
       - description: emailId
         in: path
@@ -277,44 +390,35 @@ paths:
       summary: Get Raw Email Content
       tags:
       - Extra Operations
-  /fetchLatestEmail:
-    get:
+  /emptyInbox:
+    delete:
       deprecated: false
-      description: Will return either the last received email or wait for an email to arrive and return that. If you need to wait for an email for a non-empty inbox see the other receive methods.
-      operationId: waitForLatestEmail
+      description: Deletes all emails
+      operationId: emptyInbox
       parameters:
-      - allowEmptyValue: false
-        description: Email address of the inbox we are fetching emails from
-        in: query
-        name: inboxEmailAddress
-        schema:
-          type: string
-      - allowEmptyValue: false
-        description: Id of the inbox we are fetching emails from
+      - description: inboxId
         in: query
         name: inboxId
+        required: true
         schema:
           format: uuid
           type: string
       responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Email'
-          description: OK
+        204:
+          content: {}
+          description: No Content
         401:
           content: {}
           description: Unauthorized
         403:
           content: {}
           description: Forbidden
-        404:
+        410:
           content: {}
-          description: Not Found
+          description: Gone
       security:
       - API_KEY: []
-      summary: Fetch inbox's latest email or if empty wait for email to arrive
+      summary: Delete all emails in an inbox
       tags:
       - Common Operations
   /inboxes:
@@ -697,6 +801,157 @@ paths:
       summary: Send an email from a random email address
       tags:
       - Common Operations
+  /waitForEmailCount:
+    get:
+      deprecated: false
+      description: Will only wait if count is greater that the found emails in given inbox.If you need to wait for an email for a non-empty inbox see the other receive methods.
+      operationId: waitForEmailCount
+      parameters:
+      - allowEmptyValue: false
+        description: Number of emails to wait for. Must be greater that 1
+        in: query
+        name: count
+        schema:
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Id of the inbox we are fetching emails from
+        in: query
+        name: inboxId
+        schema:
+          format: uuid
+          type: string
+      - allowEmptyValue: false
+        description: Max milliseconds to wait
+        in: query
+        name: timeout
+        schema:
+          format: int64
+          type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EmailPreview'
+                type: array
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: 'Wait for and return count number of emails '
+      tags:
+      - Common Operations
+  /waitForLatestEmail:
+    get:
+      deprecated: false
+      description: Will return either the last received email or wait for an email to arrive and return that. If you need to wait for an email for a non-empty inbox see the other receive methods.
+      operationId: waitForLatestEmail
+      parameters:
+      - allowEmptyValue: false
+        description: Id of the inbox we are fetching emails from
+        in: query
+        name: inboxId
+        schema:
+          format: uuid
+          type: string
+      - allowEmptyValue: false
+        description: Max milliseconds to wait
+        in: query
+        name: timeout
+        schema:
+          format: int64
+          type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Email'
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Fetch inbox's latest email or if empty wait for email to arrive
+      tags:
+      - Common Operations
+  /waitForMatchingEmails:
+    post:
+      deprecated: false
+      description: Results must also meet provided count. Match options allow simple CONTAINS or EQUALS filtering on SUBJECT, TO, BCC, CC, and FROM.
+      operationId: waitForMatchingEmail
+      parameters:
+      - allowEmptyValue: false
+        description: Number of emails to wait for. Must be greater that 1
+        in: query
+        name: count
+        schema:
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Id of the inbox we are fetching emails from
+        in: query
+        name: inboxId
+        schema:
+          format: uuid
+          type: string
+      - allowEmptyValue: false
+        description: Max milliseconds to wait
+        in: query
+        name: timeout
+        schema:
+          format: int64
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchOptions'
+        description: matchOptions
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EmailPreview'
+                type: array
+          description: OK
+        201:
+          content: {}
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Wait or return list of emails that match simple matching patterns
+      tags:
+      - Common Operations
   /waitForNthEmail:
     get:
       deprecated: false
@@ -715,6 +970,13 @@ paths:
         name: index
         schema:
           format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Max milliseconds to wait
+        in: query
+        name: timeout
+        schema:
+          format: int64
           type: integer
       responses:
         200:
@@ -739,6 +1001,32 @@ paths:
       - Common Operations
 components:
   schemas:
+    MatchOption:
+      example:
+        field: SUBJECT
+        should: CONTAIN
+        value: value
+      properties:
+        field:
+          description: The email property to match on. One of SUBJECT, TO, BCC, CC or FROM
+          enum:
+          - SUBJECT
+          - TO
+          - BCC
+          - CC
+          - FROM
+          type: string
+        should:
+          description: What criteria to apply. CONTAIN or EQUAL. Note CONTAIN is recommended due to some SMTP servers adding new lines
+          enum:
+          - CONTAIN
+          - EQUAL
+          type: string
+        value:
+          description: The value to compare to the field using EQUAL or CONTAIN
+          type: string
+      title: MatchOption
+      type: object
     BulkSendEmailOptions:
       description: Bulk sending options
       example:
@@ -750,6 +1038,9 @@ components:
           - cc
           - cc
           charset: charset
+          attachments:
+          - attachments
+          - attachments
           bcc:
           - bcc
           - bcc
@@ -882,6 +1173,9 @@ components:
         - cc
         - cc
         charset: charset
+        attachments:
+        - attachments
+        - attachments
         bcc:
         - bcc
         - bcc
@@ -894,6 +1188,11 @@ components:
         - to
         body: body
       properties:
+        attachments:
+          description: Optional list of attachment IDs to send with this email
+          items:
+            type: string
+          type: array
         bcc:
           description: Optional list of bcc destination email addresses
           items:
@@ -929,6 +1228,24 @@ components:
       required:
       - to
       title: SendEmailOptions
+      type: object
+    MatchOptions:
+      description: Optional filter for matching emails based on fields
+      example:
+        matches:
+        - field: SUBJECT
+          should: CONTAIN
+          value: value
+        - field: SUBJECT
+          should: CONTAIN
+          value: value
+      properties:
+        matches:
+          description: 1 or more match options. Options are additive so if one does not match the email is excluded from results
+          items:
+            $ref: '#/components/schemas/MatchOption'
+          type: array
+      title: MatchOptions
       type: object
     CreateWebhookOptions:
       example:
@@ -984,18 +1301,43 @@ components:
     EmailPreview:
       description: Preview of an email message. For full message call the message endpoint with a given message id.
       example:
+        cc:
+        - cc
+        - cc
+        bcc:
+        - bcc
+        - bcc
         created: 2000-01-23T04:56:07.000+00:00
+        subject: subject
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        to:
+        - to
+        - to
       properties:
+        bcc:
+          items:
+            type: string
+          type: array
+        cc:
+          items:
+            type: string
+          type: array
         created:
           format: date-time
           type: string
         id:
           format: uuid
           type: string
+        subject:
+          type: string
+        to:
+          items:
+            type: string
+          type: array
       required:
       - created
       - id
+      - to
       title: EmailPreview
       type: object
     EmailAnalysis:
@@ -1024,6 +1366,24 @@ components:
       - spfVerdict
       - virusVerdict
       title: EmailAnalysis
+      type: object
+    UploadAttachmentOptions:
+      description: Options for uploading files for attachments
+      example:
+        filename: filename
+        base64Contents: base64Contents
+        contentType: contentType
+      properties:
+        base64Contents:
+          description: Base64 encoded string of file contents
+          type: string
+        contentType:
+          description: Optional contentType for file. For instance application/pdf
+          type: string
+        filename:
+          description: Optional filename to save upload with
+          type: string
+      title: UploadAttachmentOptions
       type: object
     Inbox:
       description: Representation of an inbox with an email address. Emails can be sent to or from this email address.

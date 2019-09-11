@@ -12,6 +12,8 @@ package mailslurp
 
 // Options for sending an email message from an inbox
 type SendEmailOptions struct {
+	// Optional list of attachment IDs to send with this email
+	Attachments []string `json:"attachments,omitempty"`
 	// Optional list of bcc destination email addresses
 	Bcc []string `json:"bcc,omitempty"`
 	// Contents of email

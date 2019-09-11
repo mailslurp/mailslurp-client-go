@@ -9,16 +9,13 @@
  */
 
 package mailslurp
-import (
-	"time"
-)
 
-// Preview of an email message. For full message call the message endpoint with a given message id.
-type EmailPreview struct {
-	Bcc []string `json:"bcc,omitempty"`
-	Cc []string `json:"cc,omitempty"`
-	Created time.Time `json:"created"`
-	Id string `json:"id"`
-	Subject string `json:"subject,omitempty"`
-	To []string `json:"to"`
+// Options for uploading files for attachments
+type UploadAttachmentOptions struct {
+	// Base64 encoded string of file contents
+	Base64Contents string `json:"base64Contents,omitempty"`
+	// Optional contentType for file. For instance application/pdf
+	ContentType string `json:"contentType,omitempty"`
+	// Optional filename to save upload with
+	Filename string `json:"filename,omitempty"`
 }

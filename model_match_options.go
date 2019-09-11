@@ -9,16 +9,9 @@
  */
 
 package mailslurp
-import (
-	"time"
-)
 
-// Preview of an email message. For full message call the message endpoint with a given message id.
-type EmailPreview struct {
-	Bcc []string `json:"bcc,omitempty"`
-	Cc []string `json:"cc,omitempty"`
-	Created time.Time `json:"created"`
-	Id string `json:"id"`
-	Subject string `json:"subject,omitempty"`
-	To []string `json:"to"`
+// Optional filter for matching emails based on fields
+type MatchOptions struct {
+	// 1 or more match options. Options are additive so if one does not match the email is excluded from results
+	Matches []MatchOption `json:"matches,omitempty"`
 }
