@@ -63,7 +63,7 @@ func NewConfiguration() *Configuration {
 	cfg := &Configuration{
 		BasePath:      "https://api.mailslurp.com",
 		DefaultHeader: make(map[string]string),
-		UserAgent:     "OpenAPI-Generator/4.8.1/go",
+		UserAgent:     "OpenAPI-Generator/4.8.2/go",
 	}
 	return cfg
 }
