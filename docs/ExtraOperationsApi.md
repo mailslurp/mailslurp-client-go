@@ -13,6 +13,7 @@ Method | HTTP request | Description
 [**DeleteInbox**](ExtraOperationsApi.md#DeleteInbox) | **Delete** /inboxes/{inboxId} | Delete Inbox / Email Address
 [**DeleteWebhook**](ExtraOperationsApi.md#DeleteWebhook) | **Delete** /inboxes/{inboxId}/webhooks/{webhookId} | Delete and disable a WebHook for an Inbox
 [**DownloadAttachment**](ExtraOperationsApi.md#DownloadAttachment) | **Get** /emails/{emailId}/attachments/{attachmentId} | Get email attachment
+[**ForwardEmail**](ExtraOperationsApi.md#ForwardEmail) | **Post** /emails/{emailId}/forward | Forward Email
 [**GetEmail**](ExtraOperationsApi.md#GetEmail) | **Get** /emails/{emailId} | Get Email Content
 [**GetEmails**](ExtraOperationsApi.md#GetEmails) | **Get** /inboxes/{inboxId}/emails | List Emails in an Inbox / EmailAddress
 [**GetInbox**](ExtraOperationsApi.md#GetInbox) | **Get** /inboxes/{inboxId} | Get Inbox / EmailAddress
@@ -269,6 +270,35 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **ForwardEmail**
+> ForwardEmail(ctx, emailId, forwardEmailOptions)
+Forward Email
+
+Forward email content to given recipients
+
+### Required Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+  **emailId** | [**string**](.md)| emailId | 
+  **forwardEmailOptions** | [**ForwardEmailOptions**](ForwardEmailOptions.md)| forwardEmailOptions | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

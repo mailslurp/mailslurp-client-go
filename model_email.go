@@ -20,9 +20,11 @@ type Email struct {
 	Bcc []string `json:"bcc,omitempty"`
 	Body string `json:"body,omitempty"`
 	Cc []string `json:"cc,omitempty"`
+	Charset string `json:"charset,omitempty"`
 	CreatedAt time.Time `json:"createdAt"`
 	From string `json:"from,omitempty"`
 	Headers map[string]string `json:"headers,omitempty"`
+	Html bool `json:"html,omitempty"`
 	Id string `json:"id"`
 	InboxId string `json:"inboxId"`
 	RawUrl string `json:"rawUrl,omitempty"`

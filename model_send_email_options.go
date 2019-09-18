@@ -12,11 +12,11 @@ package mailslurp
 
 // Options for sending an email message from an inbox
 type SendEmailOptions struct {
-	// Optional list of attachment IDs to send with this email
+	// Optional list of attachment IDs to send with this email. You must first upload each attachment separately in order to obtain attachment IDs
 	Attachments []string `json:"attachments,omitempty"`
 	// Optional list of bcc destination email addresses
 	Bcc []string `json:"bcc,omitempty"`
-	// Contents of email
+	// Contents of email. If HTML set isHTML to true. You can use moustache templates here if you provide a templateVariables option
 	Body string `json:"body,omitempty"`
 	// Optional list of cc destination email addresses
 	Cc []string `json:"cc,omitempty"`
@@ -29,6 +29,8 @@ type SendEmailOptions struct {
 	ReplyTo string `json:"replyTo,omitempty"`
 	// Optional email subject line
 	Subject string `json:"subject,omitempty"`
+	// Optional map of template variables. Will replace moustache syntax variables in subject or body with the associated values
+	TemplateVariables map[string]interface{} `json:"templateVariables,omitempty"`
 	// List of destination email addresses. Even single recipients must be in array form.
 	To []string `json:"to"`
 }

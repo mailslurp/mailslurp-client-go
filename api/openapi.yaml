@@ -360,6 +360,44 @@ paths:
       summary: Get email attachment
       tags:
       - Extra Operations
+  /emails/{emailId}/forward:
+    post:
+      deprecated: false
+      description: Forward email content to given recipients
+      operationId: forwardEmail
+      parameters:
+      - description: emailId
+        in: path
+        name: emailId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForwardEmailOptions'
+        description: forwardEmailOptions
+        required: true
+      responses:
+        201:
+          content: {}
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Forward Email
+      tags:
+      - Extra Operations
   /emails/{emailId}/raw:
     get:
       deprecated: false
@@ -1005,31 +1043,37 @@ paths:
       - Common Operations
 components:
   schemas:
-    MatchOption:
+    ForwardEmailOptions:
+      description: Options for forwarding an email
       example:
-        field: SUBJECT
-        should: CONTAIN
-        value: value
+        cc:
+        - cc
+        - cc
+        bcc:
+        - bcc
+        - bcc
+        subject: subject
+        to:
+        - to
+        - to
       properties:
-        field:
-          description: The email property to match on. One of SUBJECT, TO, BCC, CC or FROM
-          enum:
-          - SUBJECT
-          - TO
-          - BCC
-          - CC
-          - FROM
+        to:
+          items:
+            type: string
+          type: array
+        subject:
           type: string
-        should:
-          description: What criteria to apply. CONTAIN or EQUAL. Note CONTAIN is recommended due to some SMTP servers adding new lines
-          enum:
-          - CONTAIN
-          - EQUAL
-          type: string
-        value:
-          description: The value to compare to the field using EQUAL or CONTAIN
-          type: string
-      title: MatchOption
+        cc:
+          items:
+            type: string
+          type: array
+        bcc:
+          items:
+            type: string
+          type: array
+      required:
+      - to
+      title: ForwardEmailOptions
       type: object
     BulkSendEmailOptions:
       description: Bulk sending options
@@ -1056,6 +1100,7 @@ components:
           - to
           - to
           body: body
+          templateVariables: '{}'
       properties:
         inboxIds:
           description: Inboxes to send from
@@ -1075,6 +1120,7 @@ components:
         cc:
         - cc
         - cc
+        charset: charset
         headers:
           key: headers
         attachments:
@@ -1095,6 +1141,7 @@ components:
         createdAt: 2000-01-23T04:56:07.000+00:00
         rawUrl: rawUrl
         from: from
+        html: true
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         to:
         - to
@@ -1118,6 +1165,8 @@ components:
           items:
             type: string
           type: array
+        charset:
+          type: string
         createdAt:
           format: date-time
           type: string
@@ -1127,6 +1176,8 @@ components:
           additionalProperties:
             type: string
           type: object
+        html:
+          type: boolean
         id:
           format: uuid
           type: string
@@ -1170,87 +1221,6 @@ components:
       - username
       title: BasicAuthOptions
       type: object
-    SendEmailOptions:
-      description: Options for sending an email message from an inbox
-      example:
-        cc:
-        - cc
-        - cc
-        charset: charset
-        attachments:
-        - attachments
-        - attachments
-        bcc:
-        - bcc
-        - bcc
-        subject: subject
-        replyTo: replyTo
-        from: from
-        html: true
-        to:
-        - to
-        - to
-        body: body
-      properties:
-        attachments:
-          description: Optional list of attachment IDs to send with this email
-          items:
-            type: string
-          type: array
-        bcc:
-          description: Optional list of bcc destination email addresses
-          items:
-            type: string
-          type: array
-        body:
-          description: Contents of email
-          type: string
-        cc:
-          description: Optional list of cc destination email addresses
-          items:
-            type: string
-          type: array
-        charset:
-          description: Optional charset
-          type: string
-        from:
-          description: Optional from address. If not set source inbox address will be used
-          type: string
-        html:
-          type: boolean
-        replyTo:
-          description: Optional replyTo header
-          type: string
-        subject:
-          description: Optional email subject line
-          type: string
-        to:
-          description: List of destination email addresses. Even single recipients must be in array form.
-          items:
-            type: string
-          type: array
-      required:
-      - to
-      title: SendEmailOptions
-      type: object
-    MatchOptions:
-      description: Optional filter for matching emails based on fields
-      example:
-        matches:
-        - field: SUBJECT
-          should: CONTAIN
-          value: value
-        - field: SUBJECT
-          should: CONTAIN
-          value: value
-      properties:
-        matches:
-          description: 1 or more match options. Options are additive so if one does not match the email is excluded from results
-          items:
-            $ref: '#/components/schemas/MatchOption'
-          type: array
-      title: MatchOptions
-      type: object
     CreateWebhookOptions:
       example:
         basicAuth:
@@ -1267,40 +1237,6 @@ components:
         name:
           type: string
       title: CreateWebhookOptions
-      type: object
-    Webhook:
-      description: Representation of a webhook for an inbox.
-      example:
-        createdAt: 2000-01-23T04:56:07.000+00:00
-        basicAuth: true
-        name: name
-        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        updatedAt: 2000-01-23T04:56:07.000+00:00
-      properties:
-        basicAuth:
-          description: Does Webhook expect basic authentication
-          type: boolean
-        createdAt:
-          format: date-time
-          type: string
-        id:
-          description: ID of the Webhook
-          format: uuid
-          type: string
-        inboxId:
-          description: The inbox that the Webhook will be triggered by
-          format: uuid
-          type: string
-        name:
-          type: string
-        updatedAt:
-          format: date-time
-          type: string
-      required:
-      - createdAt
-      - updatedAt
-      title: Webhook
       type: object
     EmailPreview:
       description: Preview of an email message. For full message call the message endpoint with a given message id.
@@ -1343,6 +1279,152 @@ components:
       - id
       - to
       title: EmailPreview
+      type: object
+    MatchOption:
+      example:
+        field: SUBJECT
+        should: CONTAIN
+        value: value
+      properties:
+        field:
+          description: The email property to match on. One of SUBJECT, TO, BCC, CC or FROM
+          enum:
+          - SUBJECT
+          - TO
+          - BCC
+          - CC
+          - FROM
+          type: string
+        should:
+          description: What criteria to apply. CONTAIN or EQUAL. Note CONTAIN is recommended due to some SMTP servers adding new lines
+          enum:
+          - CONTAIN
+          - EQUAL
+          type: string
+        value:
+          description: The value to compare to the field using EQUAL or CONTAIN
+          type: string
+      title: MatchOption
+      type: object
+    SendEmailOptions:
+      description: Options for sending an email message from an inbox
+      example:
+        cc:
+        - cc
+        - cc
+        charset: charset
+        attachments:
+        - attachments
+        - attachments
+        bcc:
+        - bcc
+        - bcc
+        subject: subject
+        replyTo: replyTo
+        from: from
+        html: true
+        to:
+        - to
+        - to
+        body: body
+        templateVariables: '{}'
+      properties:
+        attachments:
+          description: Optional list of attachment IDs to send with this email. You must first upload each attachment separately in order to obtain attachment IDs
+          items:
+            type: string
+          type: array
+        bcc:
+          description: Optional list of bcc destination email addresses
+          items:
+            type: string
+          type: array
+        body:
+          description: Contents of email. If HTML set isHTML to true. You can use moustache templates here if you provide a templateVariables option
+          type: string
+        cc:
+          description: Optional list of cc destination email addresses
+          items:
+            type: string
+          type: array
+        charset:
+          description: Optional charset
+          type: string
+        from:
+          description: Optional from address. If not set source inbox address will be used
+          type: string
+        html:
+          type: boolean
+        replyTo:
+          description: Optional replyTo header
+          type: string
+        subject:
+          description: Optional email subject line
+          type: string
+        templateVariables:
+          description: Optional map of template variables. Will replace moustache syntax variables in subject or body with the associated values
+          properties: {}
+          type: object
+        to:
+          description: List of destination email addresses. Even single recipients must be in array form.
+          items:
+            type: string
+          type: array
+      required:
+      - to
+      title: SendEmailOptions
+      type: object
+    MatchOptions:
+      description: Optional filter for matching emails based on fields
+      example:
+        matches:
+        - field: SUBJECT
+          should: CONTAIN
+          value: value
+        - field: SUBJECT
+          should: CONTAIN
+          value: value
+      properties:
+        matches:
+          description: 1 or more match options. Options are additive so if one does not match the email is excluded from results
+          items:
+            $ref: '#/components/schemas/MatchOption'
+          type: array
+      title: MatchOptions
+      type: object
+    Webhook:
+      description: Representation of a webhook for an inbox.
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        basicAuth: true
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        basicAuth:
+          description: Does Webhook expect basic authentication
+          type: boolean
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          description: ID of the Webhook
+          format: uuid
+          type: string
+        inboxId:
+          description: The inbox that the Webhook will be triggered by
+          format: uuid
+          type: string
+        name:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+      - createdAt
+      - updatedAt
+      title: Webhook
       type: object
     EmailAnalysis:
       description: Analysis of email

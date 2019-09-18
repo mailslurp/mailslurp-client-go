@@ -8,9 +8,11 @@ Name | Type | Description | Notes
 **Bcc** | **[]string** |  | [optional] 
 **Body** | **string** |  | [optional] 
 **Cc** | **[]string** |  | [optional] 
+**Charset** | **string** |  | [optional] 
 **CreatedAt** | [**time.Time**](time.Time.md) |  | 
 **From** | **string** |  | [optional] 
 **Headers** | **map[string]string** |  | [optional] 
+**Html** | **bool** |  | [optional] 
 **Id** | **string** |  | 
 **InboxId** | **string** |  | 
 **RawUrl** | **string** |  | [optional] 
