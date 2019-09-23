@@ -7,13 +7,17 @@ Method | HTTP request | Description
 [**BulkCreateInboxes**](ExtraOperationsApi.md#BulkCreateInboxes) | **Post** /bulk/inboxes | Bulk create Inboxes (email addresses)
 [**BulkDeleteInboxes**](ExtraOperationsApi.md#BulkDeleteInboxes) | **Delete** /bulk/inboxes | Bulk Delete Inboxes
 [**BulkSendEmails**](ExtraOperationsApi.md#BulkSendEmails) | **Post** /bulk/send | Bulk Send Emails
+[**CreateDomain**](ExtraOperationsApi.md#CreateDomain) | **Post** /domains | Create Domain
 [**CreateInbox**](ExtraOperationsApi.md#CreateInbox) | **Post** /inboxes | Create an Inbox (email address)
 [**CreateWebhook**](ExtraOperationsApi.md#CreateWebhook) | **Post** /inboxes/{inboxId}/webhooks | Attach a WebHook URL to an inbox
+[**DeleteDomain**](ExtraOperationsApi.md#DeleteDomain) | **Delete** /domains/{id} | Delete a domain
 [**DeleteEmail1**](ExtraOperationsApi.md#DeleteEmail1) | **Delete** /emails/{emailId} | Delete Email
 [**DeleteInbox**](ExtraOperationsApi.md#DeleteInbox) | **Delete** /inboxes/{inboxId} | Delete Inbox / Email Address
 [**DeleteWebhook**](ExtraOperationsApi.md#DeleteWebhook) | **Delete** /inboxes/{inboxId}/webhooks/{webhookId} | Delete and disable a WebHook for an Inbox
 [**DownloadAttachment**](ExtraOperationsApi.md#DownloadAttachment) | **Get** /emails/{emailId}/attachments/{attachmentId} | Get email attachment
 [**ForwardEmail**](ExtraOperationsApi.md#ForwardEmail) | **Post** /emails/{emailId}/forward | Forward Email
+[**GetDomain**](ExtraOperationsApi.md#GetDomain) | **Get** /domains/{id} | Get a domain
+[**GetDomains**](ExtraOperationsApi.md#GetDomains) | **Get** /domains | Get domains
 [**GetEmail**](ExtraOperationsApi.md#GetEmail) | **Get** /emails/{emailId} | Get Email Content
 [**GetEmails**](ExtraOperationsApi.md#GetEmails) | **Get** /inboxes/{inboxId}/emails | List Emails in an Inbox / EmailAddress
 [**GetInbox**](ExtraOperationsApi.md#GetInbox) | **Get** /inboxes/{inboxId} | Get Inbox / EmailAddress
@@ -109,14 +113,53 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **CreateInbox**
-> Inbox CreateInbox(ctx, )
-Create an Inbox (email address)
+# **CreateDomain**
+> DomainPlusVerificationRecordsAndStatus CreateDomain(ctx, createDomainOptions)
+Create Domain
 
-Create a new inbox and ephemeral email address to send and receive from. This is a necessary step before sending or receiving emails. The response contains the inbox's ID and its associated email address. It is recommended that you create a new inbox during each test method so that it is unique and empty
+Link a domain that you own with MailSlurp so you can create inboxes with it. Returns DNS records used for validation. You must add these verification records to your host provider's DNS setup to verify the domain.
 
 ### Required Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+  **createDomainOptions** | [**CreateDomainOptions**](CreateDomainOptions.md)| domainOptions | 
+
+### Return type
+
+[**DomainPlusVerificationRecordsAndStatus**](Domain plus verification records and status.md)
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **CreateInbox**
+> Inbox CreateInbox(ctx, optional)
+Create an Inbox (email address)
+
+Create a new inbox and with a ranmdomized email address to send and receive from. Pass emailAddress parameter if you wish to use a specific email address. Creating an inbox is required before sending or receiving emails. If writing tests it is recommended that you create a new inbox during each test method so that it is unique and empty. 
+
+### Required Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+ **optional** | ***CreateInboxOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+Optional parameters are passed through a pointer to a CreateInboxOpts struct
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **emailAddress** | **optional.String**| Optional email address including domain you wish inbox to use (eg: test123@mydomain.com). Only supports domains that you have registered and verified with MailSlurp using dashboard or &#x60;createDomain&#x60; method. | 
 
 ### Return type
 
@@ -159,6 +202,32 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: application/json
  - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **DeleteDomain**
+> DeleteDomain(ctx, id)
+Delete a domain
+
+### Required Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+  **id** | [**string**](.md)| id | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -300,6 +369,56 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: application/json
  - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **GetDomain**
+> DomainPlusVerificationRecordsAndStatus GetDomain(ctx, id)
+Get a domain
+
+Returns domain verification status and tokens
+
+### Required Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+  **id** | [**string**](.md)| id | 
+
+### Return type
+
+[**DomainPlusVerificationRecordsAndStatus**](Domain plus verification records and status.md)
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **GetDomains**
+> []DomainPreview GetDomains(ctx, )
+Get domains
+
+### Required Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**[]DomainPreview**](DomainPreview.md)
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

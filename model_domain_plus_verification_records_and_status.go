@@ -13,13 +13,12 @@ import (
 	"time"
 )
 
-// Preview of an email message. For full message call the email endpoints with the provided email id.
-type EmailPreview struct {
-	Bcc []string `json:"bcc,omitempty"`
-	Cc []string `json:"cc,omitempty"`
-	Created time.Time `json:"created"`
-	// ID of the Email.
-	Id string `json:"id,omitempty"`
-	Subject string `json:"subject,omitempty"`
-	To []string `json:"to"`
+type DomainPlusVerificationRecordsAndStatus struct {
+	CreatedAt time.Time `json:"createdAt"`
+	Domain string `json:"domain"`
+	Id string `json:"id"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	UserId string `json:"userId"`
+	VerificationToken string `json:"verificationToken"`
+	Verified bool `json:"verified"`
 }

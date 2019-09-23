@@ -9,17 +9,9 @@
  */
 
 package mailslurp
-import (
-	"time"
-)
 
-// Preview of an email message. For full message call the email endpoints with the provided email id.
-type EmailPreview struct {
-	Bcc []string `json:"bcc,omitempty"`
-	Cc []string `json:"cc,omitempty"`
-	Created time.Time `json:"created"`
-	// ID of the Email.
-	Id string `json:"id,omitempty"`
-	Subject string `json:"subject,omitempty"`
-	To []string `json:"to"`
+// Options for creating a domain to use with MailSlurp. You must have ownership access to this domain in order to verify it.
+type CreateDomainOptions struct {
+	// The top level domain you wish to use with MailSlurp
+	Domain string `json:"domain,omitempty"`
 }

@@ -262,6 +262,128 @@ paths:
       summary: Delete email address and its emails
       tags:
       - Common Operations
+  /domains:
+    get:
+      deprecated: false
+      operationId: getDomains
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DomainPreview'
+                type: array
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get domains
+      tags:
+      - Extra Operations
+    post:
+      deprecated: false
+      description: Link a domain that you own with MailSlurp so you can create inboxes with it. Returns DNS records used for validation. You must add these verification records to your host provider's DNS setup to verify the domain.
+      operationId: createDomain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDomainOptions'
+        description: domainOptions
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain plus verification records and status'
+          description: Created
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Create Domain
+      tags:
+      - Extra Operations
+  /domains/{id}:
+    delete:
+      deprecated: false
+      operationId: deleteDomain
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        204:
+          content: {}
+          description: No Content
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        410:
+          content: {}
+          description: Gone
+      security:
+      - API_KEY: []
+      summary: Delete a domain
+      tags:
+      - Extra Operations
+    get:
+      deprecated: false
+      description: Returns domain verification status and tokens
+      operationId: getDomain
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain plus verification records and status'
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get a domain
+      tags:
+      - Extra Operations
   /emails/{emailId}:
     delete:
       deprecated: false
@@ -493,8 +615,21 @@ paths:
       - Extra Operations
     post:
       deprecated: false
-      description: Create a new inbox and ephemeral email address to send and receive from. This is a necessary step before sending or receiving emails. The response contains the inbox's ID and its associated email address. It is recommended that you create a new inbox during each test method so that it is unique and empty
+      description: 'Create a new inbox and with a ranmdomized email address to send
+        and receive from. Pass emailAddress parameter if you wish to use a specific
+        email address. Creating an inbox is required before sending or receiving emails.
+        If writing tests it is recommended that you create a new inbox during each
+        test method so that it is unique and empty. '
       operationId: createInbox
+      parameters:
+      - allowEmptyValue: false
+        description: 'Optional email address including domain you wish inbox to use
+          (eg: test123@mydomain.com). Only supports domains that you have registered
+          and verified with MailSlurp using dashboard or `createDomain` method.'
+        in: query
+        name: emailAddress
+        schema:
+          type: string
       responses:
         201:
           content:
@@ -1043,6 +1178,16 @@ paths:
       - Common Operations
 components:
   schemas:
+    CreateDomainOptions:
+      description: Options for creating a domain to use with MailSlurp. You must have ownership access to this domain in order to verify it.
+      example:
+        domain: domain
+      properties:
+        domain:
+          description: The top level domain you wish to use with MailSlurp
+          type: string
+      title: CreateDomainOptions
+      type: object
     ForwardEmailOptions:
       description: Options for forwarding an email
       example:
@@ -1239,7 +1384,7 @@ components:
       title: CreateWebhookOptions
       type: object
     EmailPreview:
-      description: Preview of an email message. For full message call the message endpoint with a given message id.
+      description: Preview of an email message. For full message call the email endpoints with the provided email id.
       example:
         cc:
         - cc
@@ -1266,6 +1411,7 @@ components:
           format: date-time
           type: string
         id:
+          description: ID of the Email.
           format: uuid
           type: string
         subject:
@@ -1276,7 +1422,6 @@ components:
           type: array
       required:
       - created
-      - id
       - to
       title: EmailPreview
       type: object
@@ -1391,6 +1536,60 @@ components:
             $ref: '#/components/schemas/MatchOption'
           type: array
       title: MatchOptions
+      type: object
+    Domain plus verification records and status:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        domain: domain
+        verificationToken: verificationToken
+        verified: true
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        userId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        domain:
+          type: string
+        id:
+          format: uuid
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        userId:
+          format: uuid
+          type: string
+        verificationToken:
+          type: string
+        verified:
+          type: boolean
+      required:
+      - createdAt
+      - domain
+      - id
+      - updatedAt
+      - userId
+      - verificationToken
+      - verified
+      title: Domain plus verification records and status
+      type: object
+    DomainPreview:
+      description: Preview object for domain entity
+      example:
+        domain: domain
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        domain:
+          type: string
+        id:
+          format: uuid
+          type: string
+      required:
+      - domain
+      - id
+      title: DomainPreview
       type: object
     Webhook:
       description: Representation of a webhook for an inbox.
