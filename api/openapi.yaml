@@ -384,6 +384,49 @@ paths:
       summary: Get a domain
       tags:
       - Extra Operations
+  /emails:
+    get:
+      deprecated: false
+      description: Responses are paginated
+      operationId: getEmailsPaginated
+      parameters:
+      - allowEmptyValue: false
+        description: Optional page index in email list pagination
+        in: query
+        name: page
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional page size in email list pagination
+        in: query
+        name: size
+        schema:
+          default: 20
+          format: int32
+          type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page«EmailProjection»'
+          description: OK
+        401:
+          content: {}
+          description: Unauthorized
+        403:
+          content: {}
+          description: Forbidden
+        404:
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get all emails
+      tags:
+      - Extra Operations
   /emails/{emailId}:
     delete:
       deprecated: false
@@ -451,6 +494,12 @@ paths:
       description: Returns the specified attachment for a given email as a byte stream (file download). Get the attachmentId from the email response. Requires enterprise account.
       operationId: downloadAttachment
       parameters:
+      - allowEmptyValue: false
+        description: Can pass apiKey in url for this request if you wish to download the file in a browser
+        in: query
+        name: apiKey
+        schema:
+          type: string
       - description: attachmentId
         in: path
         name: attachmentId
@@ -536,7 +585,7 @@ paths:
       responses:
         200:
           content:
-            application/json:
+            text/plain:
               schema:
                 type: string
           description: OK
@@ -1389,6 +1438,7 @@ components:
         cc:
         - cc
         - cc
+        createdAt: 2000-01-23T04:56:07.000+00:00
         bcc:
         - bcc
         - bcc
@@ -1410,6 +1460,9 @@ components:
         created:
           format: date-time
           type: string
+        createdAt:
+          format: date-time
+          type: string
         id:
           description: ID of the Email.
           format: uuid
@@ -1422,6 +1475,7 @@ components:
           type: array
       required:
       - created
+      - createdAt
       - to
       title: EmailPreview
       type: object
@@ -1450,6 +1504,34 @@ components:
           description: The value to compare to the field using EQUAL or CONTAIN
           type: string
       title: MatchOption
+      type: object
+    Pageable:
+      example:
+        paged: true
+        pageNumber: 5
+        offset: 1
+        pageSize: 5
+        unpaged: true
+        sort:
+          unsorted: true
+          sorted: true
+      properties:
+        offset:
+          format: int64
+          type: integer
+        pageNumber:
+          format: int32
+          type: integer
+        pageSize:
+          format: int32
+          type: integer
+        paged:
+          type: boolean
+        sort:
+          $ref: '#/components/schemas/Sort'
+        unpaged:
+          type: boolean
+      title: Pageable
       type: object
     SendEmailOptions:
       description: Options for sending an email message from an inbox
@@ -1578,18 +1660,110 @@ components:
     DomainPreview:
       description: Preview object for domain entity
       example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
         domain: domain
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
       properties:
+        createdAt:
+          format: date-time
+          type: string
         domain:
           type: string
         id:
           format: uuid
           type: string
       required:
+      - createdAt
       - domain
       - id
       title: DomainPreview
+      type: object
+    Page«EmailProjection»:
+      example:
+        number: 0
+        last: true
+        numberOfElements: 6
+        size: 2
+        totalPages: 9
+        pageable:
+          paged: true
+          pageNumber: 5
+          offset: 1
+          pageSize: 5
+          unpaged: true
+          sort:
+            unsorted: true
+            sorted: true
+        sort:
+          unsorted: true
+          sorted: true
+        content:
+        - cc:
+          - cc
+          - cc
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          bcc:
+          - bcc
+          - bcc
+          subject: subject
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          to:
+          - to
+          - to
+        - cc:
+          - cc
+          - cc
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          bcc:
+          - bcc
+          - bcc
+          subject: subject
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          to:
+          - to
+          - to
+        first: true
+        totalElements: 7
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/EmailProjection'
+          type: array
+        first:
+          type: boolean
+        last:
+          type: boolean
+        number:
+          format: int32
+          type: integer
+        numberOfElements:
+          format: int32
+          type: integer
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        size:
+          format: int32
+          type: integer
+        sort:
+          $ref: '#/components/schemas/Sort'
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      title: Page«EmailProjection»
+      type: object
+    Sort:
+      example:
+        unsorted: true
+        sorted: true
+      properties:
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+      title: Sort
       type: object
     Webhook:
       description: Representation of a webhook for an inbox.
@@ -1644,13 +1818,48 @@ components:
           type: string
         virusVerdict:
           type: string
-      required:
-      - dkimVerdict
-      - dmarcVerdict
-      - spamVerdict
-      - spfVerdict
-      - virusVerdict
       title: EmailAnalysis
+      type: object
+    EmailProjection:
+      example:
+        cc:
+        - cc
+        - cc
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        bcc:
+        - bcc
+        - bcc
+        subject: subject
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        to:
+        - to
+        - to
+      properties:
+        bcc:
+          items:
+            type: string
+          type: array
+        cc:
+          items:
+            type: string
+          type: array
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        subject:
+          type: string
+        to:
+          items:
+            type: string
+          type: array
+      required:
+      - createdAt
+      - id
+      - to
+      title: EmailProjection
       type: object
     UploadAttachmentOptions:
       description: Options for uploading files for attachments

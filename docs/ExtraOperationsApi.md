@@ -20,6 +20,7 @@ Method | HTTP request | Description
 [**GetDomains**](ExtraOperationsApi.md#GetDomains) | **Get** /domains | Get domains
 [**GetEmail**](ExtraOperationsApi.md#GetEmail) | **Get** /emails/{emailId} | Get Email Content
 [**GetEmails**](ExtraOperationsApi.md#GetEmails) | **Get** /inboxes/{inboxId}/emails | List Emails in an Inbox / EmailAddress
+[**GetEmailsPaginated**](ExtraOperationsApi.md#GetEmailsPaginated) | **Get** /emails | Get all emails
 [**GetInbox**](ExtraOperationsApi.md#GetInbox) | **Get** /inboxes/{inboxId} | Get Inbox / EmailAddress
 [**GetInboxes**](ExtraOperationsApi.md#GetInboxes) | **Get** /inboxes | List Inboxes / Email Addresses
 [**GetRawEmailContents**](ExtraOperationsApi.md#GetRawEmailContents) | **Get** /emails/{emailId}/raw | Get Raw Email Content
@@ -315,7 +316,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **DownloadAttachment**
-> DownloadAttachment(ctx, attachmentId, emailId)
+> DownloadAttachment(ctx, attachmentId, emailId, optional)
 Get email attachment
 
 Returns the specified attachment for a given email as a byte stream (file download). Get the attachmentId from the email response. Requires enterprise account.
@@ -327,6 +328,16 @@ Name | Type | Description  | Notes
  **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
   **attachmentId** | **string**| attachmentId | 
   **emailId** | [**string**](.md)| emailId | 
+ **optional** | ***DownloadAttachmentOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+Optional parameters are passed through a pointer to a DownloadAttachmentOpts struct
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+ **apiKey** | **optional.String**| Can pass apiKey in url for this request if you wish to download the file in a browser | 
 
 ### Return type
 
@@ -490,6 +501,42 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **GetEmailsPaginated**
+> PageEmailProjection GetEmailsPaginated(ctx, optional)
+Get all emails
+
+Responses are paginated
+
+### Required Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+ **optional** | ***GetEmailsPaginatedOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+Optional parameters are passed through a pointer to a GetEmailsPaginatedOpts struct
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **optional.Int32**| Optional page index in email list pagination | [default to 0]
+ **size** | **optional.Int32**| Optional page size in email list pagination | [default to 20]
+
+### Return type
+
+[**PageEmailProjection**](Page«EmailProjection».md)
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **GetInbox**
 > Inbox GetInbox(ctx, inboxId)
 Get Inbox / EmailAddress
@@ -566,7 +613,7 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: application/json
+ - **Accept**: text/plain
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

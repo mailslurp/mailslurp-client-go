@@ -3,6 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**CreatedAt** | [**time.Time**](time.Time.md) |  | 
 **Domain** | **string** |  | 
 **Id** | **string** |  | 
 

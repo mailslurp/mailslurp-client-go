@@ -13,14 +13,11 @@ import (
 	"time"
 )
 
-// Preview of an email message. For full message call the email endpoints with the provided email id.
-type EmailPreview struct {
+type EmailProjection struct {
 	Bcc []string `json:"bcc,omitempty"`
 	Cc []string `json:"cc,omitempty"`
-	Created time.Time `json:"created"`
 	CreatedAt time.Time `json:"createdAt"`
-	// ID of the Email.
-	Id string `json:"id,omitempty"`
+	Id string `json:"id"`
 	Subject string `json:"subject,omitempty"`
 	To []string `json:"to"`
 }

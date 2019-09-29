@@ -9,9 +9,13 @@
  */
 
 package mailslurp
+import (
+	"time"
+)
 
 // Preview object for domain entity
 type DomainPreview struct {
+	CreatedAt time.Time `json:"createdAt"`
 	Domain string `json:"domain"`
 	Id string `json:"id"`
 }

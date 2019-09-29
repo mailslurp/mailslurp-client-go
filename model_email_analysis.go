@@ -12,9 +12,9 @@ package mailslurp
 
 // Analysis of email
 type EmailAnalysis struct {
-	DkimVerdict string `json:"dkimVerdict"`
-	DmarcVerdict string `json:"dmarcVerdict"`
-	SpamVerdict string `json:"spamVerdict"`
-	SpfVerdict string `json:"spfVerdict"`
-	VirusVerdict string `json:"virusVerdict"`
+	DkimVerdict string `json:"dkimVerdict,omitempty"`
+	DmarcVerdict string `json:"dmarcVerdict,omitempty"`
+	SpamVerdict string `json:"spamVerdict,omitempty"`
+	SpfVerdict string `json:"spfVerdict,omitempty"`
+	VirusVerdict string `json:"virusVerdict,omitempty"`
 }

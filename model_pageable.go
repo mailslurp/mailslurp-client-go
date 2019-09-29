@@ -9,18 +9,12 @@
  */
 
 package mailslurp
-import (
-	"time"
-)
 
-// Preview of an email message. For full message call the email endpoints with the provided email id.
-type EmailPreview struct {
-	Bcc []string `json:"bcc,omitempty"`
-	Cc []string `json:"cc,omitempty"`
-	Created time.Time `json:"created"`
-	CreatedAt time.Time `json:"createdAt"`
-	// ID of the Email.
-	Id string `json:"id,omitempty"`
-	Subject string `json:"subject,omitempty"`
-	To []string `json:"to"`
+type Pageable struct {
+	Offset int64 `json:"offset,omitempty"`
+	PageNumber int32 `json:"pageNumber,omitempty"`
+	PageSize int32 `json:"pageSize,omitempty"`
+	Paged bool `json:"paged,omitempty"`
+	Sort Sort `json:"sort,omitempty"`
+	Unpaged bool `json:"unpaged,omitempty"`
 }
