@@ -338,7 +338,7 @@ This endpoint does not need any parameter.
 
 ## SendEmail
 
-> SendEmail(ctx, inboxId, sendEmailOptions)
+> SendEmail(ctx, inboxId, optional)
 
 Send Email
 
@@ -350,8 +350,18 @@ Send an email from the inbox's email address. Specify the email recipients and c
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**inboxId** | [**string**](.md)| inboxId | 
-**sendEmailOptions** | [**SendEmailOptions**](SendEmailOptions.md)| sendEmailOptions | 
+**inboxId** | [**string**](.md)| ID of the inbox you want to send the email from | 
+ **optional** | ***SendEmailOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a SendEmailOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **sendEmailOptions** | [**optional.Interface of SendEmailOptions**](SendEmailOptions.md)| Options for the email | 
 
 ### Return type
 

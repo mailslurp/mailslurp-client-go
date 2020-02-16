@@ -272,7 +272,7 @@ Optional parameters are passed through a pointer to a WaitForNthEmailOpts struct
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **inboxId** | [**optional.Interface of string**](.md)| Id of the inbox we are fetching emails from | 
+ **inboxId** | [**optional.Interface of string**](.md)| Id of the inbox you are fetching emails from | 
  **index** | **optional.Int32**| Zero based index of the email to wait for | 
  **timeout** | **optional.Int64**| Max milliseconds to wait | 
  **unreadOnly** | **optional.Bool**| Optional filter for unread only | [default to false]

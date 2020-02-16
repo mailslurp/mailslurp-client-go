@@ -13,7 +13,7 @@ Method | HTTP request | Description
 
 ## CreateDomain
 
-> DomainPlusVerificationRecordsAndStatus CreateDomain(ctx, domainOptions)
+> DomainDto CreateDomain(ctx, domainOptions)
 
 Create Domain
 
@@ -29,7 +29,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**DomainPlusVerificationRecordsAndStatus**](Domain plus verification records and status.md)
+[**DomainDto**](DomainDto.md)
 
 ### Authorization
 
@@ -81,7 +81,7 @@ Name | Type | Description  | Notes
 
 ## GetDomain
 
-> DomainPlusVerificationRecordsAndStatus GetDomain(ctx, id)
+> DomainDto GetDomain(ctx, id)
 
 Get a domain
 
@@ -97,7 +97,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**DomainPlusVerificationRecordsAndStatus**](Domain plus verification records and status.md)
+[**DomainDto**](DomainDto.md)
 
 ### Authorization
 

@@ -11,15 +11,13 @@ package mailslurp
 import (
 	"time"
 )
-// EmailProjection struct for EmailProjection
-type EmailProjection struct {
-	Attachments []string `json:"attachments,omitempty"`
-	Bcc []string `json:"bcc,omitempty"`
-	Cc []string `json:"cc,omitempty"`
+// DomainDto Domain plus verification records and status
+type DomainDto struct {
 	CreatedAt time.Time `json:"createdAt"`
+	Domain string `json:"domain"`
 	Id string `json:"id"`
-	InboxId string `json:"inboxId"`
-	Read bool `json:"read,omitempty"`
-	Subject string `json:"subject,omitempty"`
-	To []string `json:"to"`
+	IsVerified bool `json:"isVerified"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	UserId string `json:"userId"`
+	VerificationToken string `json:"verificationToken"`
 }

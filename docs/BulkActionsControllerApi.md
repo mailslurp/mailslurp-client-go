@@ -16,8 +16,6 @@ Method | HTTP request | Description
 
 Bulk create Inboxes (email addresses)
 
-Enterprise Plan Required
-
 ### Required Parameters
 
 
@@ -50,8 +48,6 @@ Name | Type | Description  | Notes
 
 Bulk Delete Inboxes
 
-Enterprise Plan Required
-
 ### Required Parameters
 
 
@@ -83,8 +79,6 @@ Name | Type | Description  | Notes
 > BulkSendEmails(ctx, bulkSendEmailOptions)
 
 Bulk Send Emails
-
-Enterprise Plan Required
 
 ### Required Parameters
 
