@@ -1,6 +1,7 @@
 # MatchOption
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Field** | **string** | The email property to match on. One of SUBJECT, TO, BCC, CC or FROM | [optional] 

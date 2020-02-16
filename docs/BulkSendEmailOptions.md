@@ -1,6 +1,7 @@
 # BulkSendEmailOptions
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **InboxIds** | **[]string** | Inboxes to send from | [optional] 

@@ -1,23 +1,153 @@
 openapi: 3.0.1
 info:
-  contact:
-    email: contact@mailslurp.dev
-    name: MailSlurp
-    url: https://www.mailslurp.com
-  description: For documentation see [developer guide](https://www.mailslurp.com/developers). [Create an account](https://app.mailslurp.com) in the MailSlurp Dashboard to [view your API Key](https://app). For all bugs, feature requests, or help please [see support](https://www.mailslurp.com/support/).
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: "## Introduction \n[MailSlurp](https://www.mailslurp.com) is an Email\
+    \ API for developers and QA testers. It let's users:\n- create emails addresses\
+    \ on demand\n- receive emails and attachments in code\n- send templated HTML emails\n\
+    \n## About \nThis page contains the REST API documentation for MailSlurp. All\
+    \ requests require API Key authentication passed as an `x-api-key` header.\n\n\
+    Create an account to [get your free API Key](https://app.mailslurp.com/sign-up/).\n\
+    \n## Resources\n- \U0001f511 [Get API Key](https://app.mailslurp.com/sign-up/)\
+    \                   \n- \U0001f393 [Developer Portal](https://www.mailslurp.com/docs/)\
+    \          \n- \U0001f4e6 [Library SDKs](https://www.mailslurp.com/docs/)\n- ✍\
+    ️ [Code Examples](https://www.mailslurp.com/examples)\n- ⚠️ [Report an issue](https://drift.me/mailslurp)\n\
+    \n## Explore\n\n"
   title: MailSlurp API
-  version: 0.0.1-alpha
+  version: 6.5.2
 servers:
 - url: https://api.mailslurp.com/
 tags:
-- description: Create email addresses, send emails, and receive them
-  name: Common Operations
+- description: Endpoints for uploading attachments. See the EmailController for downloading
+    attachments.
+  name: Attachment Controller
 - description: Other endpoints including advanced receive options
-  name: Extra Operations
+  name: Bulk Actions Controller
+- description: A collection of common actions. Useful as convenience methods. See
+    other controllers for more functionality.
+  name: Common Actions Controller
+- description: Endpoints for managing contacts. Contacts can be used for sending emails
+    to individuals and groups.
+  name: Contact Controller
+- description: Endpoints for managing custom domains. Once you create a custom domain
+    you must add the returned verification records to your hosting provider. See support
+    or guides for more information.
+  name: Domain Controller
+- description: Endpoints for listing, fetching, and deleting specific emails. Use
+    these endpoints to get email contents or list attachments for an email ID that
+    you obtained using the InboxController.
+  name: Email Controller
+- description: Endpoints for managing groups. Groups can be used for sending emails
+    to individuals and groups.
+  name: Group Controller
+- description: Endpoint for interacting with inboxes / email addresses. You can create
+    a new inbox at any time. You can send an email from an inbox or you can get a
+    list of emails in an inbox. To get the contents or attachments of an email use
+    the ID returned from InboxController methods to call the EmailController endpoints
+  name: Inbox Controller
+- description: Endpoints for managing Templates. Templates can be used when sending
+    emails and support moustache syntax template variables. Variables can be passed
+    with send email options or implicitly available if Contact Groups are used.
+  name: Template Controller
+- description: Endpoint for interacting with webhooks. Webhooks have a URL that points
+    to your server. They can be added to inboxes and when an inbox receives an email
+    the email ID and inbox ID will be posted to the URL endpoint at your server. The
+    schema of the webhook payload is available at https://api.mailslurp.com/schemas/webhook-payload.
+    Use webhooks to react in real-time to inbound emails. Use the ID posted to your
+    server to fetch the full emails or attachments if you need them.
+  name: Webhook Controller
 paths:
+  /attachments:
+    post:
+      deprecated: false
+      description: When sending emails with attachments first upload each attachment
+        with this endpoint. Record the returned attachment IDs. Then use these attachment
+        IDs in the SendEmailOptions when sending an email. This means that attachments
+        can easily be reused.
+      operationId: uploadAttachment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadAttachmentOptions'
+        description: uploadOptions
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Upload an attachment for sending
+      tags:
+      - Attachment Controller
+      x-codegen-request-body-name: uploadOptions
+  /attachments/multipart:
+    post:
+      deprecated: false
+      description: When sending emails with attachments first upload each attachment
+        with this endpoint. Record the returned attachment IDs. Then use these attachment
+        IDs in the SendEmailOptions when sending an email. This means that attachments
+        can easily be reused.
+      operationId: uploadMultipartForm
+      parameters:
+      - description: contentType
+        in: query
+        name: contentType
+        schema:
+          type: string
+      - description: filename
+        in: query
+        name: filename
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  description: file
+                  format: binary
+                  type: string
+              required:
+              - file
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Upload an attachment for sending using Multipart Form
+      tags:
+      - Attachment Controller
   /bulk/inboxes:
     delete:
       deprecated: false
@@ -34,20 +164,21 @@ paths:
         description: ids
         required: true
       responses:
-        204:
+        "204":
           content: {}
           description: No Content
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
       security:
       - API_KEY: []
       summary: Bulk Delete Inboxes
       tags:
-      - Extra Operations
+      - Bulk Actions Controller
+      x-codegen-request-body-name: ids
     post:
       deprecated: false
       description: Enterprise Plan Required
@@ -62,7 +193,7 @@ paths:
           format: int32
           type: integer
       responses:
-        201:
+        "201":
           content:
             application/json:
               schema:
@@ -70,20 +201,20 @@ paths:
                   $ref: '#/components/schemas/Inbox'
                 type: array
           description: Created
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Bulk create Inboxes (email addresses)
       tags:
-      - Extra Operations
+      - Bulk Actions Controller
   /bulk/send:
     post:
       deprecated: false
@@ -97,90 +228,418 @@ paths:
         description: bulkSendEmailOptions
         required: true
       responses:
-        201:
+        "201":
           content: {}
           description: Created
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Bulk Send Emails
       tags:
-      - Extra Operations
-  /deleteEmail:
+      - Bulk Actions Controller
+      x-codegen-request-body-name: bulkSendEmailOptions
+  /contacts:
+    get:
+      deprecated: false
+      operationId: getContacts
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ContactProjection'
+                type: array
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get all contacts
+      tags:
+      - Contact Controller
+    post:
+      deprecated: false
+      operationId: createContact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContactOptions'
+        description: createContactOptions
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactDto'
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Create a contact
+      tags:
+      - Contact Controller
+      x-codegen-request-body-name: createContactOptions
+  /contacts/paginated:
+    get:
+      deprecated: false
+      operationId: getAllContacts
+      parameters:
+      - allowEmptyValue: false
+        description: Optional page index in inbox list pagination
+        in: query
+        name: page
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional page size in inbox list pagination
+        in: query
+        name: size
+        schema:
+          default: 20
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional createdAt sort direction ASC or DESC
+        in: query
+        name: sort
+        schema:
+          default: ASC
+          enum:
+          - ASC
+          - DESC
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page«ContactProjection»'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get all contacts
+      tags:
+      - Contact Controller
+  /contacts/{contactId}:
     delete:
       deprecated: false
-      description: Deletes an email
-      operationId: deleteEmail
+      operationId: deleteContact
       parameters:
-      - description: emailId
-        in: query
-        name: emailId
+      - description: contactId
+        in: path
+        name: contactId
         required: true
         schema:
           format: uuid
           type: string
       responses:
-        204:
+        "204":
           content: {}
           description: No Content
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        410:
+      security:
+      - API_KEY: []
+      summary: Delete contact
+      tags:
+      - Contact Controller
+    get:
+      deprecated: false
+      operationId: getContact
+      parameters:
+      - description: contactId
+        in: path
+        name: contactId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactDto'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get contact
+      tags:
+      - Contact Controller
+  /domains:
+    get:
+      deprecated: false
+      description: List all custom domains you have created
+      operationId: getDomains
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DomainPreview'
+                type: array
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get domains
+      tags:
+      - Domain Controller
+    post:
+      deprecated: false
+      description: Link a domain that you own with MailSlurp so you can create email
+        addresses using it. Endpoint returns DNS records used for validation. You
+        must add these verification records to your host provider's DNS setup to verify
+        the domain.
+      operationId: createDomain
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDomainOptions'
+        description: domainOptions
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain plus verification records and status'
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Create Domain
+      tags:
+      - Domain Controller
+      x-codegen-request-body-name: domainOptions
+  /domains/{id}:
+    delete:
+      deprecated: false
+      description: Delete a domain. This will disable any existing inboxes that use
+        this domain.
+      operationId: deleteDomain
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "204":
+          content: {}
+          description: No Content
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "410":
           content: {}
           description: Gone
       security:
       - API_KEY: []
-      summary: Delete an email
+      summary: Delete a domain
       tags:
-      - Common Operations
-  /deleteEmailAddress:
+      - Domain Controller
+    get:
+      deprecated: false
+      description: Returns domain verification status and tokens for a given domain
+      operationId: getDomain
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain plus verification records and status'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get a domain
+      tags:
+      - Domain Controller
+  /emails:
     delete:
       deprecated: false
-      description: Deletes an inbox
-      operationId: deleteEmailAddress
+      description: Deletes all emails
+      operationId: deleteAllEmails
+      responses:
+        "204":
+          content: {}
+          description: No Content
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+      security:
+      - API_KEY: []
+      summary: Delete all emails
+      tags:
+      - Email Controller
+    get:
+      deprecated: false
+      description: Responses are paginated
+      operationId: getEmailsPaginated
       parameters:
-      - description: inboxId
+      - allowEmptyValue: false
+        description: Optional inbox ids to filter by. Can be repeated
+        explode: true
         in: query
         name: inboxId
-        required: true
         schema:
-          format: uuid
+          items:
+            format: uuid
+            type: string
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: Optional page index in email list pagination
+        in: query
+        name: page
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional page size in email list pagination
+        in: query
+        name: size
+        schema:
+          default: 20
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional createdAt sort direction ASC or DESC
+        in: query
+        name: sort
+        schema:
+          default: ASC
+          enum:
+          - ASC
+          - DESC
           type: string
+      - allowEmptyValue: false
+        description: Optional filter for unread emails only
+        in: query
+        name: unreadOnly
+        schema:
+          default: false
+          type: boolean
       responses:
-        204:
-          content: {}
-          description: No Content
-        401:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page«EmailProjection»'
+          description: OK
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        410:
+        "404":
           content: {}
-          description: Gone
+          description: Not Found
       security:
       - API_KEY: []
-      summary: Delete email address and its emails
+      summary: Get all emails
       tags:
-      - Common Operations
+      - Email Controller
   /emails/{emailId}:
     delete:
       deprecated: false
       description: Deletes an email and removes it from the inbox
-      operationId: deleteEmail_1
+      operationId: deleteEmail
       parameters:
       - description: emailId
         in: path
@@ -190,23 +649,24 @@ paths:
           format: uuid
           type: string
       responses:
-        204:
+        "204":
           content: {}
           description: No Content
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
       security:
       - API_KEY: []
       summary: Delete Email
       tags:
-      - Extra Operations
+      - Email Controller
     get:
       deprecated: false
-      description: Returns a email summary object with headers and content. To retrieve the raw unparsed email use the getRawMessage endpoint
+      description: Returns a email summary object with headers and content. To retrieve
+        the raw unparsed email use the getRawMessage endpoint
       operationId: getEmail
       parameters:
       - description: emailId
@@ -217,31 +677,118 @@ paths:
           format: uuid
           type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Email'
           description: OK
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Get Email Content
       tags:
-      - Extra Operations
+      - Email Controller
+  /emails/{emailId}/attachments:
+    get:
+      deprecated: false
+      description: Returns an array of attachment metadata such as name and content-type
+        for a given email if present.
+      operationId: getAttachments
+      parameters:
+      - description: emailId
+        in: path
+        name: emailId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AttachmentMetaData'
+                type: array
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get all email attachment metadata
+      tags:
+      - Email Controller
   /emails/{emailId}/attachments/{attachmentId}:
     get:
       deprecated: false
-      description: Returns the specified attachment for a given email as a byte stream (file download). Get the attachmentId from the email response. Requires enterprise account.
+      description: Returns the specified attachment for a given email as a byte stream
+        (file download). Get the attachmentId from the email response.
       operationId: downloadAttachment
+      parameters:
+      - allowEmptyValue: false
+        description: Can pass apiKey in url for this request if you wish to download
+          the file in a browser
+        in: query
+        name: apiKey
+        schema:
+          type: string
+      - description: attachmentId
+        in: path
+        name: attachmentId
+        required: true
+        schema:
+          type: string
+      - description: emailId
+        in: path
+        name: emailId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                format: byte
+                type: string
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get email attachment
+      tags:
+      - Email Controller
+  /emails/{emailId}/attachments/{attachmentId}/metadata:
+    get:
+      deprecated: false
+      description: Returns the metadata such as name and content-type for a given
+        attachment and email.
+      operationId: getAttachmentMetaData
       parameters:
       - description: attachmentId
         in: path
@@ -257,23 +804,65 @@ paths:
           format: uuid
           type: string
       responses:
-        200:
-          content: {}
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentMetaData'
           description: OK
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
-      summary: Get email attachment
+      summary: Get email attachment metadata
       tags:
-      - Extra Operations
+      - Email Controller
+  /emails/{emailId}/forward:
+    post:
+      deprecated: false
+      description: Forward email content to given recipients
+      operationId: forwardEmail
+      parameters:
+      - description: emailId
+        in: path
+        name: emailId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForwardEmailOptions'
+        description: forwardEmailOptions
+        required: true
+      responses:
+        "201":
+          content: {}
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Forward Email
+      tags:
+      - Email Controller
+      x-codegen-request-body-name: forwardEmailOptions
   /emails/{emailId}/raw:
     get:
       deprecated: false
@@ -288,26 +877,60 @@ paths:
           format: uuid
           type: string
       responses:
-        200:
+        "200":
           content:
-            application/json:
+            text/plain:
               schema:
                 type: string
           description: OK
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Get Raw Email Content
       tags:
-      - Extra Operations
+      - Email Controller
+  /emails/{emailId}/validate:
+    post:
+      deprecated: false
+      description: Validate HTML content of email
+      operationId: validateEmail
+      parameters:
+      - description: emailId
+        in: path
+        name: emailId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationDto'
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Validate email
+      tags:
+      - Email Controller
   /emptyInbox:
     delete:
       deprecated: false
@@ -322,30 +945,333 @@ paths:
           format: uuid
           type: string
       responses:
-        204:
+        "204":
           content: {}
           description: No Content
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        410:
-          content: {}
-          description: Gone
       security:
       - API_KEY: []
       summary: Delete all emails in an inbox
       tags:
-      - Common Operations
+      - Common Actions Controller
+  /groups:
+    get:
+      deprecated: false
+      operationId: getGroups
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/GroupProjection'
+                type: array
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get all groups
+      tags:
+      - Group Controller
+    post:
+      deprecated: false
+      operationId: createGroup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupOptions'
+        description: createGroupOptions
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupDto'
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Create a group
+      tags:
+      - Group Controller
+      x-codegen-request-body-name: createGroupOptions
+  /groups/paginated:
+    get:
+      deprecated: false
+      operationId: getAllGroups
+      parameters:
+      - allowEmptyValue: false
+        description: Optional page index in inbox list pagination
+        in: query
+        name: page
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional page size in inbox list pagination
+        in: query
+        name: size
+        schema:
+          default: 20
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional createdAt sort direction ASC or DESC
+        in: query
+        name: sort
+        schema:
+          default: ASC
+          enum:
+          - ASC
+          - DESC
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page«GroupProjection»'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get all Contact Groups in paginated format
+      tags:
+      - Group Controller
+  /groups/{groupId}:
+    delete:
+      deprecated: false
+      operationId: deleteGroup
+      parameters:
+      - description: groupId
+        in: path
+        name: groupId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "204":
+          content: {}
+          description: No Content
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+      security:
+      - API_KEY: []
+      summary: Delete group
+      tags:
+      - Group Controller
+    get:
+      deprecated: false
+      operationId: getGroup
+      parameters:
+      - description: groupId
+        in: path
+        name: groupId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupDto'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get group
+      tags:
+      - Group Controller
+  /groups/{groupId}/contacts:
+    delete:
+      deprecated: false
+      operationId: removeContactsFromGroup
+      parameters:
+      - description: groupId
+        in: path
+        name: groupId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGroupContacts'
+        description: updateGroupContactsOption
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupContactsDto'
+          description: OK
+        "204":
+          content: {}
+          description: No Content
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+      security:
+      - API_KEY: []
+      summary: Remove contacts from a group
+      tags:
+      - Group Controller
+      x-codegen-request-body-name: updateGroupContactsOption
+    get:
+      deprecated: false
+      operationId: getGroupWithContacts
+      parameters:
+      - description: groupId
+        in: path
+        name: groupId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupContactsDto'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get group and contacts belonging to it
+      tags:
+      - Group Controller
+    put:
+      deprecated: false
+      operationId: addContactsToGroup
+      parameters:
+      - description: groupId
+        in: path
+        name: groupId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGroupContacts'
+        description: updateGroupContactsOption
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupContactsDto'
+          description: OK
+        "201":
+          content: {}
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Add contacts to a group
+      tags:
+      - Group Controller
+      x-codegen-request-body-name: updateGroupContactsOption
   /inboxes:
+    delete:
+      deprecated: false
+      description: Permanently delete all inboxes and associated email addresses and
+        all emails within the given inboxes
+      operationId: deleteAllInboxes
+      responses:
+        "204":
+          content: {}
+          description: No Content
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+      security:
+      - API_KEY: []
+      summary: Delete all inboxes
+      tags:
+      - Inbox Controller
     get:
       deprecated: false
       description: List the inboxes you have created
       operationId: getInboxes
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -353,49 +1279,169 @@ paths:
                   $ref: '#/components/schemas/Inbox'
                 type: array
           description: OK
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: List Inboxes / Email Addresses
       tags:
-      - Extra Operations
+      - Inbox Controller
     post:
       deprecated: false
-      description: Create a new inbox and ephemeral email address to send and receive from. This is a necessary step before sending or receiving emails. The response contains the inbox's ID and its associated email address. It is recommended that you create a new inbox during each test method so that it is unique and empty
+      description: 'Create a new inbox and with a ranmdomized email address to send
+        and receive from. Pass emailAddress parameter if you wish to use a specific
+        email address. Creating an inbox is required before sending or receiving emails.
+        If writing tests it is recommended that you create a new inbox during each
+        test method so that it is unique and empty. '
       operationId: createInbox
+      parameters:
+      - allowEmptyValue: false
+        description: Optional description for an inbox.
+        in: query
+        name: description
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: 'Optional email address including domain you wish inbox to use
+          (eg: test123@mydomain.com). Only supports domains that you have registered
+          and verified with MailSlurp using dashboard or `createDomain` method.'
+        in: query
+        name: emailAddress
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: Optional expires at timestamp. If your plan supports this feature
+          you can specify when an inbox should expire. If left empty inbox will exist
+          permanently or expire when your plan dictates
+        in: query
+        name: expiresAt
+        schema:
+          format: date-time
+          type: string
+      - allowEmptyValue: false
+        description: Is inbox favourited.
+        in: query
+        name: favourite
+        schema:
+          type: boolean
+      - allowEmptyValue: false
+        description: Optional name for an inbox.
+        in: query
+        name: name
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: Optional tags for an inbox. Can be used for searching and filtering
+          inboxes.
+        explode: true
+        in: query
+        name: tags
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
       responses:
-        201:
+        "201":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Inbox'
           description: Created
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Create an Inbox (email address)
       tags:
-      - Extra Operations
+      - Inbox Controller
+  /inboxes/paginated:
+    get:
+      deprecated: false
+      description: List inboxes in paginated form. Allows for page index, page size,
+        and sort direction. Can also filter by favourited or email address like pattern.
+      operationId: getAllInboxes
+      parameters:
+      - allowEmptyValue: false
+        description: Optionally filter results for favourites only
+        in: query
+        name: favourite
+        schema:
+          default: false
+          type: boolean
+      - allowEmptyValue: false
+        description: Optional page index in inbox list pagination
+        in: query
+        name: page
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optionally filter by search words partial matching ID, tags,
+          name, and email address
+        in: query
+        name: search
+        schema:
+          type: string
+      - allowEmptyValue: false
+        description: Optional page size in inbox list pagination
+        in: query
+        name: size
+        schema:
+          default: 20
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional createdAt sort direction ASC or DESC
+        in: query
+        name: sort
+        schema:
+          default: ASC
+          enum:
+          - ASC
+          - DESC
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page«InboxProjection»'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: List Inboxes Paginated
+      tags:
+      - Inbox Controller
   /inboxes/{inboxId}:
     delete:
       deprecated: false
-      description: Permanently delete an inbox and associated email address
+      description: Permanently delete an inbox and associated email address and all
+        emails within the given inboxes
       operationId: deleteInbox
       parameters:
       - description: inboxId
@@ -406,23 +1452,24 @@ paths:
           format: uuid
           type: string
       responses:
-        204:
+        "204":
           content: {}
           description: No Content
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
       security:
       - API_KEY: []
       summary: Delete Inbox / Email Address
       tags:
-      - Extra Operations
+      - Inbox Controller
     get:
       deprecated: false
-      description: Returns an inbox's properties, including its email address and ID.
+      description: Returns an inbox's properties, including its email address and
+        ID.
       operationId: getInbox
       parameters:
       - description: inboxId
@@ -433,29 +1480,32 @@ paths:
           format: uuid
           type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Inbox'
           description: OK
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Get Inbox / EmailAddress
       tags:
-      - Extra Operations
+      - Inbox Controller
     post:
       deprecated: false
-      description: Send an email from the inbox's email address. Specify the email recipients and contents in the request body. See the `SendEmailOptions` for more information. Note the `inboxId` refers to the inbox's id NOT its email address
+      description: Send an email from the inbox's email address. Specify the email
+        recipients and contents in the request body. See the `SendEmailOptions` for
+        more information. Note the `inboxId` refers to the inbox's id NOT its email
+        address
       operationId: sendEmail
       parameters:
       - description: inboxId
@@ -473,27 +1523,33 @@ paths:
         description: sendEmailOptions
         required: true
       responses:
-        201:
+        "201":
           content: {}
           description: Created
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Send Email
       tags:
-      - Extra Operations
+      - Inbox Controller
+      x-codegen-request-body-name: sendEmailOptions
   /inboxes/{inboxId}/emails:
     get:
       deprecated: false
-      description: List emails that an inbox has received. Only emails that are sent to the inbox's email address will appear in the inbox. It may take several seconds for any email you send to an inbox's email address to appear in the inbox. To make this endpoint wait for a minimum number of emails use the `minCount` parameter. The server will retry the inbox database until the `minCount` is satisfied or the `retryTimeout` is reached
+      description: List emails that an inbox has received. Only emails that are sent
+        to the inbox's email address will appear in the inbox. It may take several
+        seconds for any email you send to an inbox's email address to appear in the
+        inbox. To make this endpoint wait for a minimum number of emails use the `minCount`
+        parameter. The server will retry the inbox database until the `minCount` is
+        satisfied or the `retryTimeout` is reached
       operationId: getEmails
       parameters:
       - description: Id of inbox that emails belongs to
@@ -504,21 +1560,23 @@ paths:
           format: uuid
           type: string
       - allowEmptyValue: false
-        description: Limit the result set, ordered by descending received date time
+        description: Limit the result set, ordered by received date time sort direction
         in: query
         name: limit
         schema:
           format: int32
           type: integer
       - allowEmptyValue: false
-        description: Minimum acceptable email count. Will cause request to hang (and retry) until minCount is satisfied or retryTimeout is reached.
+        description: Minimum acceptable email count. Will cause request to hang (and
+          retry) until minCount is satisfied or retryTimeout is reached.
         in: query
         name: minCount
         schema:
           format: int64
           type: integer
       - allowEmptyValue: false
-        description: Maximum milliseconds to spend retrying inbox database until minCount emails are returned
+        description: Maximum milliseconds to spend retrying inbox database until minCount
+          emails are returned
         in: query
         name: retryTimeout
         schema:
@@ -531,8 +1589,17 @@ paths:
         schema:
           format: date-time
           type: string
+      - allowEmptyValue: false
+        description: Sort the results by received date and direction ASC or DESC
+        in: query
+        name: sort
+        schema:
+          enum:
+          - ASC
+          - DESC
+          type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -540,20 +1607,126 @@ paths:
                   $ref: '#/components/schemas/EmailPreview'
                 type: array
           description: OK
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
-      summary: List Emails in an Inbox / EmailAddress
+      summary: Get emails in an Inbox
       tags:
-      - Extra Operations
+      - Inbox Controller
+  /inboxes/{inboxId}/emails/paginated:
+    get:
+      deprecated: false
+      description: Get a paginated list of emails in an inbox. Does not hold connections
+        open.
+      operationId: getInboxEmailsPaginated
+      parameters:
+      - description: Id of inbox that emails belongs to
+        in: path
+        name: inboxId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - allowEmptyValue: false
+        description: Optional page index in inbox emails list pagination
+        in: query
+        name: page
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional page size in inbox emails list pagination
+        in: query
+        name: size
+        schema:
+          default: 20
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional createdAt sort direction ASC or DESC
+        in: query
+        name: sort
+        schema:
+          default: ASC
+          enum:
+          - ASC
+          - DESC
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page«EmailPreview»'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get inbox emails paginated
+      tags:
+      - Inbox Controller
+  /inboxes/{inboxId}/favourite:
+    put:
+      deprecated: false
+      description: Set and return new favourite state for an inbox
+      operationId: setInboxFavourited
+      parameters:
+      - description: inboxId
+        in: path
+        name: inboxId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetInboxFavouritedOptions'
+        description: setInboxFavouritedOptions
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbox'
+          description: OK
+        "201":
+          content: {}
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Set inbox favourited state
+      tags:
+      - Inbox Controller
+      x-codegen-request-body-name: setInboxFavouritedOptions
   /inboxes/{inboxId}/webhooks:
     get:
       deprecated: false
@@ -567,31 +1740,34 @@ paths:
           format: uuid
           type: string
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/Webhook'
+                  $ref: '#/components/schemas/WebhookDto'
                 type: array
           description: OK
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
-      summary: Get all WebHooks for an Inbox
+      summary: Get all Webhooks for an Inbox
       tags:
-      - Extra Operations
+      - Webhook Controller
     post:
       deprecated: false
-      description: Get notified whenever an inbox receives an email via a WebHook URL. An emailID will be posted to this URL every time an email is received for this inbox. The URL must be publicly reachable by the MailSlurp server. You can provide basicAuth values if you wish to secure this endpoint.
+      description: Get notified whenever an inbox receives an email via a WebHook
+        URL. An emailID will be posted to this URL every time an email is received
+        for this inbox. The URL must be publicly reachable by the MailSlurp server.
+        You can provide basicAuth values if you wish to secure this endpoint.
       operationId: createWebhook
       parameters:
       - description: inboxId
@@ -609,26 +1785,27 @@ paths:
         description: webhookOptions
         required: true
       responses:
-        201:
+        "201":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Webhook'
+                $ref: '#/components/schemas/WebhookDto'
           description: Created
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Attach a WebHook URL to an inbox
       tags:
-      - Extra Operations
+      - Webhook Controller
+      x-codegen-request-body-name: webhookOptions
   /inboxes/{inboxId}/webhooks/{webhookId}:
     delete:
       deprecated: false
@@ -649,50 +1826,51 @@ paths:
           format: uuid
           type: string
       responses:
-        204:
+        "204":
           content: {}
           description: No Content
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
       security:
       - API_KEY: []
-      summary: Delete and disable a WebHook for an Inbox
+      summary: Delete and disable a Webhook for an Inbox
       tags:
-      - Extra Operations
+      - Webhook Controller
   /newEmailAddress:
     post:
       deprecated: false
       description: Returns an Inbox with an `id` and an `emailAddress`
       operationId: createNewEmailAddress
       responses:
-        201:
+        "201":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Inbox'
           description: Created
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
-      summary: Create new email address
+      summary: Create new random inbox
       tags:
-      - Common Operations
+      - Common Actions Controller
   /sendEmail:
     post:
       deprecated: false
-      description: To specify an email address first create an inbox and use that with the other send email methods
+      description: To specify an email address first create an inbox and use that
+        with the other send email methods
       operationId: sendEmailSimple
       requestBody:
         content:
@@ -702,27 +1880,200 @@ paths:
         description: sendEmailOptions
         required: true
       responses:
-        201:
+        "201":
           content: {}
           description: Created
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Send an email from a random email address
       tags:
-      - Common Operations
+      - Common Actions Controller
+      x-codegen-request-body-name: sendEmailOptions
+  /templates:
+    get:
+      deprecated: false
+      operationId: getTemplates
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/TemplateProjection'
+                type: array
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get all Templates
+      tags:
+      - Template Controller
+    post:
+      deprecated: false
+      operationId: createTemplate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateOptions'
+        description: createTemplateOptions
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateDto'
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Create a Template
+      tags:
+      - Template Controller
+      x-codegen-request-body-name: createTemplateOptions
+  /templates/paginated:
+    get:
+      deprecated: false
+      operationId: getAllTemplates
+      parameters:
+      - allowEmptyValue: false
+        description: Optional page index in inbox list pagination
+        in: query
+        name: page
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional page size in inbox list pagination
+        in: query
+        name: size
+        schema:
+          default: 20
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional createdAt sort direction ASC or DESC
+        in: query
+        name: sort
+        schema:
+          default: ASC
+          enum:
+          - ASC
+          - DESC
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page«TemplateProjection»'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get all Templates in paginated format
+      tags:
+      - Template Controller
+  /templates/{TemplateId}:
+    delete:
+      deprecated: false
+      operationId: deleteTemplate
+      parameters:
+      - description: TemplateId
+        in: path
+        name: TemplateId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "204":
+          content: {}
+          description: No Content
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+      security:
+      - API_KEY: []
+      summary: Delete Template
+      tags:
+      - Template Controller
+    get:
+      deprecated: false
+      operationId: getTemplate
+      parameters:
+      - description: TemplateId
+        in: path
+        name: TemplateId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateDto'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get Template
+      tags:
+      - Template Controller
   /waitForEmailCount:
     get:
       deprecated: false
-      description: Will only wait if count is greater that the found emails in given inbox.If you need to wait for an email for a non-empty inbox see the other receive methods.
+      description: Will only wait if count is greater that the found emails in given
+        inbox.If you need to wait for an email for a non-empty inbox see the other
+        receive methods.
       operationId: waitForEmailCount
       parameters:
       - allowEmptyValue: false
@@ -746,8 +2097,15 @@ paths:
         schema:
           format: int64
           type: integer
+      - allowEmptyValue: false
+        description: Optional filter for unread only
+        in: query
+        name: unreadOnly
+        schema:
+          default: false
+          type: boolean
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -755,24 +2113,26 @@ paths:
                   $ref: '#/components/schemas/EmailPreview'
                 type: array
           description: OK
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: 'Wait for and return count number of emails '
       tags:
-      - Common Operations
+      - Common Actions Controller
   /waitForLatestEmail:
     get:
       deprecated: false
-      description: Will return either the last received email or wait for an email to arrive and return that. If you need to wait for an email for a non-empty inbox see the other receive methods.
+      description: Will return either the last received email or wait for an email
+        to arrive and return that. If you need to wait for an email for a non-empty
+        inbox see the other receive methods.
       operationId: waitForLatestEmail
       parameters:
       - allowEmptyValue: false
@@ -789,31 +2149,39 @@ paths:
         schema:
           format: int64
           type: integer
+      - allowEmptyValue: false
+        description: Optional filter for unread only
+        in: query
+        name: unreadOnly
+        schema:
+          default: false
+          type: boolean
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Email'
           description: OK
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Fetch inbox's latest email or if empty wait for email to arrive
       tags:
-      - Common Operations
+      - Common Actions Controller
   /waitForMatchingEmails:
     post:
       deprecated: false
-      description: Results must also meet provided count. Match options allow simple CONTAINS or EQUALS filtering on SUBJECT, TO, BCC, CC, and FROM.
+      description: Results must also meet provided count. Match options allow simple
+        CONTAINS or EQUALS filtering on SUBJECT, TO, BCC, CC, and FROM.
       operationId: waitForMatchingEmail
       parameters:
       - allowEmptyValue: false
@@ -837,6 +2205,13 @@ paths:
         schema:
           format: int64
           type: integer
+      - allowEmptyValue: false
+        description: Optional filter for unread only
+        in: query
+        name: unreadOnly
+        schema:
+          default: false
+          type: boolean
       requestBody:
         content:
           application/json:
@@ -845,7 +2220,7 @@ paths:
         description: matchOptions
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -853,23 +2228,24 @@ paths:
                   $ref: '#/components/schemas/EmailPreview'
                 type: array
           description: OK
-        201:
+        "201":
           content: {}
           description: Created
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Wait or return list of emails that match simple matching patterns
       tags:
-      - Common Operations
+      - Common Actions Controller
+      x-codegen-request-body-name: matchOptions
   /waitForNthEmail:
     get:
       deprecated: false
@@ -896,54 +2272,192 @@ paths:
         schema:
           format: int64
           type: integer
+      - allowEmptyValue: false
+        description: Optional filter for unread only
+        in: query
+        name: unreadOnly
+        schema:
+          default: false
+          type: boolean
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Email'
           description: OK
-        401:
+        "401":
           content: {}
           description: Unauthorized
-        403:
+        "403":
           content: {}
           description: Forbidden
-        404:
+        "404":
           content: {}
           description: Not Found
       security:
       - API_KEY: []
       summary: Wait for or fetch the email with a given index in the inbox specified
       tags:
-      - Common Operations
+      - Common Actions Controller
+  /webhooks/paginated:
+    get:
+      deprecated: false
+      description: List webhooks in paginated form. Allows for page index, page size,
+        and sort direction.
+      operationId: getAllWebhooks
+      parameters:
+      - allowEmptyValue: false
+        description: Optional page index in inbox list pagination
+        in: query
+        name: page
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional page size in inbox list pagination
+        in: query
+        name: size
+        schema:
+          default: 20
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional createdAt sort direction ASC or DESC
+        in: query
+        name: sort
+        schema:
+          default: ASC
+          enum:
+          - ASC
+          - DESC
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page«WebhookProjection»'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: List Webhooks Paginated
+      tags:
+      - Webhook Controller
+  /webhooks/{webhookId}:
+    get:
+      deprecated: false
+      operationId: getWebhook
+      parameters:
+      - description: webhookId
+        in: path
+        name: webhookId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookDto'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get a webhook for an Inbox
+      tags:
+      - Webhook Controller
+  /webhooks/{webhookId}/test:
+    post:
+      deprecated: false
+      operationId: sendTestData
+      parameters:
+      - description: webhookId
+        in: path
+        name: webhookId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookTestResult'
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Send webhook test data
+      tags:
+      - Webhook Controller
 components:
   schemas:
-    MatchOption:
+    AttachmentMetaData:
       example:
-        field: SUBJECT
-        should: CONTAIN
-        value: value
+        name: name
+        contentLength: 0
+        id: id
+        contentType: contentType
       properties:
-        field:
-          description: The email property to match on. One of SUBJECT, TO, BCC, CC or FROM
-          enum:
-          - SUBJECT
-          - TO
-          - BCC
-          - CC
-          - FROM
+        contentLength:
+          format: int64
+          type: integer
+        contentType:
           type: string
-        should:
-          description: What criteria to apply. CONTAIN or EQUAL. Note CONTAIN is recommended due to some SMTP servers adding new lines
-          enum:
-          - CONTAIN
-          - EQUAL
+        id:
           type: string
-        value:
-          description: The value to compare to the field using EQUAL or CONTAIN
+        name:
           type: string
-      title: MatchOption
+      required:
+      - contentLength
+      - contentType
+      - id
+      - name
+      title: AttachmentMetaData
+      type: object
+    BasicAuthOptions:
+      example:
+        password: password
+        username: username
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - username
+      title: BasicAuthOptions
       type: object
     BulkSendEmailOptions:
       description: Bulk sending options
@@ -955,18 +2469,27 @@ components:
           cc:
           - cc
           - cc
+          template: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           charset: charset
+          attachments:
+          - attachments
+          - attachments
           bcc:
           - bcc
           - bcc
           subject: subject
+          body: body
+          templateVariables: '{}'
+          toContacts:
+          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          isHTML: true
           replyTo: replyTo
           from: from
-          html: true
           to:
           - to
           - to
-          body: body
+          toGroup: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
       properties:
         inboxIds:
           description: Inboxes to send from
@@ -980,12 +2503,287 @@ components:
       - sendEmailOptions
       title: BulkSendEmailOptions
       type: object
+    ContactDto:
+      example:
+        firstName: firstName
+        lastName: lastName
+        metaData:
+          integralNumber: true
+          double: true
+          valueNode: true
+          bigInteger: true
+          floatingPointNumber: true
+          float: true
+          nodeType: ARRAY
+          int: true
+          long: true
+          textual: true
+          empty: true
+          missingNode: true
+          pojo: true
+          number: true
+          boolean: true
+          null: true
+          array: true
+          binary: true
+          containerNode: true
+          short: true
+          bigDecimal: true
+          object: true
+        optOut: true
+        emailAddresses:
+        - emailAddresses
+        - emailAddresses
+        company: company
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        tags:
+        - tags
+        - tags
+      properties:
+        company:
+          type: string
+        emailAddresses:
+          items:
+            type: string
+          type: array
+        firstName:
+          type: string
+        id:
+          format: uuid
+          type: string
+        lastName:
+          type: string
+        metaData:
+          $ref: '#/components/schemas/JsonNode'
+        optOut:
+          type: boolean
+        tags:
+          items:
+            type: string
+          type: array
+      required:
+      - emailAddresses
+      - id
+      - tags
+      title: ContactDto
+      type: object
+    ContactProjection:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        firstName: firstName
+        lastName: lastName
+        optOut: true
+        company: company
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        company:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        firstName:
+          type: string
+        id:
+          format: uuid
+          type: string
+        lastName:
+          type: string
+        optOut:
+          type: boolean
+      required:
+      - createdAt
+      - id
+      title: ContactProjection
+      type: object
+    CreateContactOptions:
+      example:
+        firstName: firstName
+        metaData:
+          integralNumber: true
+          double: true
+          valueNode: true
+          bigInteger: true
+          floatingPointNumber: true
+          float: true
+          nodeType: ARRAY
+          int: true
+          long: true
+          textual: true
+          empty: true
+          missingNode: true
+          pojo: true
+          number: true
+          boolean: true
+          null: true
+          array: true
+          binary: true
+          containerNode: true
+          short: true
+          bigDecimal: true
+          object: true
+        optOut: true
+        lastName: lastName
+        emailAddresses:
+        - emailAddresses
+        - emailAddresses
+        groupId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        company: company
+        tags:
+        - tags
+        - tags
+      properties:
+        emailAddresses:
+          description: Set of email addresses belonging to the contact
+          items:
+            type: string
+          type: array
+        firstName:
+          type: string
+        groupId:
+          description: Group IDs that contact belongs to
+          format: uuid
+          type: string
+        metaData:
+          $ref: '#/components/schemas/JsonNode'
+        optOut:
+          description: Has the user explicitly or implicitly opted out of being contacted?
+            If so MailSlurp will ignore them in all actions.
+          type: boolean
+        tags:
+          description: Tags that can be used to search and group contacts
+          items:
+            type: string
+          type: array
+        lastName:
+          type: string
+        company:
+          type: string
+      title: CreateContactOptions
+      type: object
+    CreateDomainOptions:
+      description: Options for creating a domain to use with MailSlurp. You must have
+        ownership access to this domain in order to verify it.
+      example:
+        domain: domain
+      properties:
+        domain:
+          description: The top level domain you wish to use with MailSlurp
+          type: string
+      title: CreateDomainOptions
+      type: object
+    CreateGroupOptions:
+      example:
+        name: name
+        description: description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+      required:
+      - name
+      title: CreateGroupOptions
+      type: object
+    CreateTemplateOptions:
+      example:
+        name: name
+        content: content
+      properties:
+        name:
+          type: string
+        content:
+          type: string
+      required:
+      - content
+      - name
+      title: CreateTemplateOptions
+      type: object
+    CreateWebhookOptions:
+      example:
+        basicAuth:
+          password: password
+          username: username
+        name: name
+        url: url
+      properties:
+        basicAuth:
+          $ref: '#/components/schemas/BasicAuthOptions'
+        name:
+          description: Optional name for the webhook
+          type: string
+        url:
+          description: Public URL on your server that MailSlurp can post WebhookNotification
+            payload to when an email is received. The payload of the submitted JSON
+            is described by https://api.mailslurp.com/schemas/webhook-payload
+          type: string
+      title: CreateWebhookOptions
+      type: object
+    Domain plus verification records and status:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        isVerified: true
+        domain: domain
+        verificationToken: verificationToken
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        userId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        domain:
+          type: string
+        id:
+          format: uuid
+          type: string
+        isVerified:
+          type: boolean
+        updatedAt:
+          format: date-time
+          type: string
+        userId:
+          format: uuid
+          type: string
+        verificationToken:
+          type: string
+      required:
+      - createdAt
+      - domain
+      - id
+      - isVerified
+      - updatedAt
+      - userId
+      - verificationToken
+      title: Domain plus verification records and status
+      type: object
+    DomainPreview:
+      description: Preview object for domain entity
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        domain: domain
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        domain:
+          type: string
+        id:
+          format: uuid
+          type: string
+      required:
+      - createdAt
+      - domain
+      - id
+      title: DomainPreview
+      type: object
     Email:
       description: Representation of an email
       example:
         cc:
         - cc
         - cc
+        charset: charset
         headers:
           key: headers
         attachments:
@@ -994,6 +2792,7 @@ components:
         bcc:
         - bcc
         - bcc
+        read: true
         subject: subject
         analysis:
           spamVerdict: spamVerdict
@@ -1005,6 +2804,7 @@ components:
         userId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         createdAt: 2000-01-23T04:56:07.000+00:00
         rawUrl: rawUrl
+        isHTML: true
         from: from
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         to:
@@ -1029,6 +2829,8 @@ components:
           items:
             type: string
           type: array
+        charset:
+          type: string
         createdAt:
           format: date-time
           type: string
@@ -1044,8 +2846,13 @@ components:
         inboxId:
           format: uuid
           type: string
+        isHTML:
+          type: boolean
         rawUrl:
           type: string
+        read:
+          description: Has the email been viewed ever
+          type: boolean
         subject:
           type: string
         to:
@@ -1067,186 +2874,6 @@ components:
       - userId
       title: Email
       type: object
-    BasicAuthOptions:
-      example:
-        password: password
-        username: username
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-      required:
-      - password
-      - username
-      title: BasicAuthOptions
-      type: object
-    SendEmailOptions:
-      description: Options for sending an email message from an inbox
-      example:
-        cc:
-        - cc
-        - cc
-        charset: charset
-        bcc:
-        - bcc
-        - bcc
-        subject: subject
-        replyTo: replyTo
-        from: from
-        html: true
-        to:
-        - to
-        - to
-        body: body
-      properties:
-        bcc:
-          description: Optional list of bcc destination email addresses
-          items:
-            type: string
-          type: array
-        body:
-          description: Contents of email
-          type: string
-        cc:
-          description: Optional list of cc destination email addresses
-          items:
-            type: string
-          type: array
-        charset:
-          description: Optional charset
-          type: string
-        from:
-          description: Optional from address. If not set source inbox address will be used
-          type: string
-        html:
-          type: boolean
-        replyTo:
-          description: Optional replyTo header
-          type: string
-        subject:
-          description: Optional email subject line
-          type: string
-        to:
-          description: List of destination email addresses. Even single recipients must be in array form.
-          items:
-            type: string
-          type: array
-      required:
-      - to
-      title: SendEmailOptions
-      type: object
-    MatchOptions:
-      description: Optional filter for matching emails based on fields
-      example:
-        matches:
-        - field: SUBJECT
-          should: CONTAIN
-          value: value
-        - field: SUBJECT
-          should: CONTAIN
-          value: value
-      properties:
-        matches:
-          description: 1 or more match options. Options are additive so if one does not match the email is excluded from results
-          items:
-            $ref: '#/components/schemas/MatchOption'
-          type: array
-      title: MatchOptions
-      type: object
-    CreateWebhookOptions:
-      example:
-        basicAuth:
-          password: password
-          username: username
-        name: name
-        url: url
-      properties:
-        basicAuth:
-          $ref: '#/components/schemas/BasicAuthOptions'
-        url:
-          description: Public URL (including protocol) that MailSlurp can post WebhookNotificationObjects to when an email is received
-          type: string
-        name:
-          type: string
-      title: CreateWebhookOptions
-      type: object
-    Webhook:
-      description: Representation of a webhook for an inbox.
-      example:
-        createdAt: 2000-01-23T04:56:07.000+00:00
-        basicAuth: true
-        name: name
-        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        updatedAt: 2000-01-23T04:56:07.000+00:00
-      properties:
-        basicAuth:
-          description: Does Webhook expect basic authentication
-          type: boolean
-        createdAt:
-          format: date-time
-          type: string
-        id:
-          description: ID of the Webhook
-          format: uuid
-          type: string
-        inboxId:
-          description: The inbox that the Webhook will be triggered by
-          format: uuid
-          type: string
-        name:
-          type: string
-        updatedAt:
-          format: date-time
-          type: string
-      required:
-      - createdAt
-      - updatedAt
-      title: Webhook
-      type: object
-    EmailPreview:
-      description: Preview of an email message. For full message call the message endpoint with a given message id.
-      example:
-        cc:
-        - cc
-        - cc
-        bcc:
-        - bcc
-        - bcc
-        created: 2000-01-23T04:56:07.000+00:00
-        subject: subject
-        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        to:
-        - to
-        - to
-      properties:
-        bcc:
-          items:
-            type: string
-          type: array
-        cc:
-          items:
-            type: string
-          type: array
-        created:
-          format: date-time
-          type: string
-        id:
-          format: uuid
-          type: string
-        subject:
-          type: string
-        to:
-          items:
-            type: string
-          type: array
-      required:
-      - created
-      - id
-      - to
-      title: EmailPreview
-      type: object
     EmailAnalysis:
       description: Analysis of email
       example:
@@ -1266,35 +2893,1533 @@ components:
           type: string
         virusVerdict:
           type: string
-      required:
-      - dkimVerdict
-      - dmarcVerdict
-      - spamVerdict
-      - spfVerdict
-      - virusVerdict
       title: EmailAnalysis
       type: object
-    Inbox:
-      description: Representation of an inbox with an email address. Emails can be sent to or from this email address.
+    EmailPreview:
+      description: Preview of an email message. For full message call the email endpoints
+        with the provided email id.
       example:
-        emailAddress: emailAddress
+        cc:
+        - cc
+        - cc
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        attachments:
+        - attachments
+        - attachments
+        bcc:
+        - bcc
+        - bcc
+        read: true
         created: 2000-01-23T04:56:07.000+00:00
+        subject: subject
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        userId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        to:
+        - to
+        - to
       properties:
+        attachments:
+          items:
+            type: string
+          type: array
+        bcc:
+          items:
+            type: string
+          type: array
+        cc:
+          items:
+            type: string
+          type: array
         created:
           format: date-time
           type: string
-        emailAddress:
-          description: The inbox's email address. Send an email to this address and the inbox will receive it
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          description: ID of the Email.
+          format: uuid
+          type: string
+        read:
+          type: boolean
+        subject:
+          type: string
+        to:
+          items:
+            type: string
+          type: array
+      required:
+      - created
+      - createdAt
+      - to
+      title: EmailPreview
+      type: object
+    EmailProjection:
+      example:
+        cc:
+        - cc
+        - cc
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        attachments:
+        - attachments
+        - attachments
+        bcc:
+        - bcc
+        - bcc
+        read: true
+        subject: subject
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        to:
+        - to
+        - to
+        inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        attachments:
+          items:
+            type: string
+          type: array
+        bcc:
+          items:
+            type: string
+          type: array
+        cc:
+          items:
+            type: string
+          type: array
+        createdAt:
+          format: date-time
           type: string
         id:
           format: uuid
           type: string
+        inboxId:
+          format: uuid
+          type: string
+        read:
+          type: boolean
+        subject:
+          type: string
+        to:
+          items:
+            type: string
+          type: array
+      required:
+      - createdAt
+      - id
+      - inboxId
+      - to
+      title: EmailProjection
+      type: object
+    ForwardEmailOptions:
+      description: Options for forwarding an email
+      example:
+        cc:
+        - cc
+        - cc
+        bcc:
+        - bcc
+        - bcc
+        subject: subject
+        to:
+        - to
+        - to
+      properties:
+        to:
+          items:
+            type: string
+          type: array
+        subject:
+          type: string
+        cc:
+          items:
+            type: string
+          type: array
+        bcc:
+          items:
+            type: string
+          type: array
+      required:
+      - to
+      title: ForwardEmailOptions
+      type: object
+    GroupContactsDto:
+      example:
+        contacts:
+        - firstName: firstName
+          lastName: lastName
+          metaData:
+            integralNumber: true
+            double: true
+            valueNode: true
+            bigInteger: true
+            floatingPointNumber: true
+            float: true
+            nodeType: ARRAY
+            int: true
+            long: true
+            textual: true
+            empty: true
+            missingNode: true
+            pojo: true
+            number: true
+            boolean: true
+            null: true
+            array: true
+            binary: true
+            containerNode: true
+            short: true
+            bigDecimal: true
+            object: true
+          optOut: true
+          emailAddresses:
+          - emailAddresses
+          - emailAddresses
+          company: company
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          tags:
+          - tags
+          - tags
+        - firstName: firstName
+          lastName: lastName
+          metaData:
+            integralNumber: true
+            double: true
+            valueNode: true
+            bigInteger: true
+            floatingPointNumber: true
+            float: true
+            nodeType: ARRAY
+            int: true
+            long: true
+            textual: true
+            empty: true
+            missingNode: true
+            pojo: true
+            number: true
+            boolean: true
+            null: true
+            array: true
+            binary: true
+            containerNode: true
+            short: true
+            bigDecimal: true
+            object: true
+          optOut: true
+          emailAddresses:
+          - emailAddresses
+          - emailAddresses
+          company: company
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          tags:
+          - tags
+          - tags
+        group:
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          name: name
+          description: description
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        contacts:
+          items:
+            $ref: '#/components/schemas/ContactDto'
+          type: array
+        group:
+          $ref: '#/components/schemas/GroupDto'
+      required:
+      - contacts
+      - group
+      title: GroupContactsDto
+      type: object
+    GroupDto:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        name: name
+        description: description
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        description:
+          type: string
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+      required:
+      - createdAt
+      - id
+      - name
+      title: GroupDto
+      type: object
+    GroupProjection:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        name: name
+        description: description
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        description:
+          type: string
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+      required:
+      - createdAt
+      - id
+      - name
+      title: GroupProjection
+      type: object
+    HTMLValidationResult:
+      example:
+        isValid: true
+        warnings:
+        - lineNumber: 0
+          message: message
+        - lineNumber: 0
+          message: message
+        errors:
+        - lineNumber: 0
+          message: message
+        - lineNumber: 0
+          message: message
+      properties:
+        errors:
+          items:
+            $ref: '#/components/schemas/ValidationMessage'
+          type: array
+        isValid:
+          type: boolean
+        warnings:
+          items:
+            $ref: '#/components/schemas/ValidationMessage'
+          type: array
+      required:
+      - errors
+      - isValid
+      - warnings
+      title: HTMLValidationResult
+      type: object
+    Inbox:
+      description: Representation of an inbox with an email address. Emails can be
+        sent to or from this email address.
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        emailAddress: emailAddress
+        created: 2000-01-23T04:56:07.000+00:00
+        name: name
+        description: description
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        favourite: true
+        userId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        expiresAt: 2000-01-23T04:56:07.000+00:00
+        tags:
+        - tags
+        - tags
+      properties:
+        created:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        description:
+          description: Description of inbox
+          type: string
+        emailAddress:
+          description: The inbox's email address. Send an email to this address and
+            the inbox will receive it
+          type: string
+        expiresAt:
+          description: When if ever will the inbox expire
+          format: date-time
+          type: string
+        favourite:
+          description: Is the inbox favourited
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        name:
+          description: Name of inbox
+          type: string
+        tags:
+          description: Tags that inbox has been tagged with
+          items:
+            type: string
+          type: array
         userId:
           format: uuid
           type: string
+      required:
+      - createdAt
+      - id
       title: Inbox
+      type: object
+    InboxProjection:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        emailAddress: emailAddress
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        favourite: true
+        expiresAt: 2000-01-23T04:56:07.000+00:00
+        tags:
+        - tags
+        - tags
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        emailAddress:
+          type: string
+        expiresAt:
+          format: date-time
+          type: string
+        favourite:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        tags:
+          items:
+            type: string
+          type: array
+      required:
+      - createdAt
+      - id
+      title: InboxProjection
+      type: object
+    JsonNode:
+      example:
+        integralNumber: true
+        double: true
+        valueNode: true
+        bigInteger: true
+        floatingPointNumber: true
+        float: true
+        nodeType: ARRAY
+        int: true
+        long: true
+        textual: true
+        empty: true
+        missingNode: true
+        pojo: true
+        number: true
+        boolean: true
+        null: true
+        array: true
+        binary: true
+        containerNode: true
+        short: true
+        bigDecimal: true
+        object: true
+      properties:
+        array:
+          type: boolean
+        bigDecimal:
+          type: boolean
+        bigInteger:
+          type: boolean
+        binary:
+          type: boolean
+        boolean:
+          type: boolean
+        containerNode:
+          type: boolean
+        double:
+          type: boolean
+        empty:
+          type: boolean
+        float:
+          type: boolean
+        floatingPointNumber:
+          type: boolean
+        int:
+          type: boolean
+        integralNumber:
+          type: boolean
+        long:
+          type: boolean
+        missingNode:
+          type: boolean
+        nodeType:
+          enum:
+          - ARRAY
+          - BINARY
+          - BOOLEAN
+          - MISSING
+          - "NULL"
+          - NUMBER
+          - OBJECT
+          - POJO
+          - STRING
+          type: string
+        null:
+          type: boolean
+        number:
+          type: boolean
+        object:
+          type: boolean
+        pojo:
+          type: boolean
+        short:
+          type: boolean
+        textual:
+          type: boolean
+        valueNode:
+          type: boolean
+      title: JsonNode
+      type: object
+    MatchOption:
+      example:
+        field: SUBJECT
+        should: CONTAIN
+        value: value
+      properties:
+        field:
+          description: The email property to match on. One of SUBJECT, TO, BCC, CC
+            or FROM
+          enum:
+          - SUBJECT
+          - TO
+          - BCC
+          - CC
+          - FROM
+          type: string
+        should:
+          description: What criteria to apply. CONTAIN or EQUAL. Note CONTAIN is recommended
+            due to some SMTP servers adding new lines
+          enum:
+          - CONTAIN
+          - EQUAL
+          type: string
+        value:
+          description: The value to compare to the field using EQUAL or CONTAIN
+          type: string
+      title: MatchOption
+      type: object
+    MatchOptions:
+      description: Optional filter for matching emails based on fields
+      example:
+        matches:
+        - field: SUBJECT
+          should: CONTAIN
+          value: value
+        - field: SUBJECT
+          should: CONTAIN
+          value: value
+      properties:
+        matches:
+          description: 1 or more match options. Options are additive so if one does
+            not match the email is excluded from results
+          items:
+            $ref: '#/components/schemas/MatchOption'
+          type: array
+      title: MatchOptions
+      type: object
+    Pageable:
+      example:
+        paged: true
+        pageNumber: 5
+        offset: 1
+        pageSize: 5
+        unpaged: true
+        sort:
+          unsorted: true
+          sorted: true
+          empty: true
+      properties:
+        offset:
+          format: int64
+          type: integer
+        pageNumber:
+          format: int32
+          type: integer
+        pageSize:
+          format: int32
+          type: integer
+        paged:
+          type: boolean
+        sort:
+          $ref: '#/components/schemas/Sort'
+        unpaged:
+          type: boolean
+      title: Pageable
+      type: object
+    Page«ContactProjection»:
+      example:
+        number: 0
+        last: true
+        numberOfElements: 6
+        size: 2
+        totalPages: 9
+        pageable:
+          paged: true
+          pageNumber: 5
+          offset: 1
+          pageSize: 5
+          unpaged: true
+          sort:
+            unsorted: true
+            sorted: true
+            empty: true
+        sort:
+          unsorted: true
+          sorted: true
+          empty: true
+        content:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          firstName: firstName
+          lastName: lastName
+          optOut: true
+          company: company
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          firstName: firstName
+          lastName: lastName
+          optOut: true
+          company: company
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        first: true
+        empty: true
+        totalElements: 7
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/ContactProjection'
+          type: array
+        empty:
+          type: boolean
+        first:
+          type: boolean
+        last:
+          type: boolean
+        number:
+          format: int32
+          type: integer
+        numberOfElements:
+          format: int32
+          type: integer
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        size:
+          format: int32
+          type: integer
+        sort:
+          $ref: '#/components/schemas/Sort'
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      title: Page«ContactProjection»
+      type: object
+    Page«EmailPreview»:
+      example:
+        number: 0
+        last: true
+        numberOfElements: 6
+        size: 1
+        totalPages: 5
+        pageable:
+          paged: true
+          pageNumber: 5
+          offset: 1
+          pageSize: 5
+          unpaged: true
+          sort:
+            unsorted: true
+            sorted: true
+            empty: true
+        sort:
+          unsorted: true
+          sorted: true
+          empty: true
+        content:
+        - cc:
+          - cc
+          - cc
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          attachments:
+          - attachments
+          - attachments
+          bcc:
+          - bcc
+          - bcc
+          read: true
+          created: 2000-01-23T04:56:07.000+00:00
+          subject: subject
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          to:
+          - to
+          - to
+        - cc:
+          - cc
+          - cc
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          attachments:
+          - attachments
+          - attachments
+          bcc:
+          - bcc
+          - bcc
+          read: true
+          created: 2000-01-23T04:56:07.000+00:00
+          subject: subject
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          to:
+          - to
+          - to
+        first: true
+        empty: true
+        totalElements: 5
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/EmailPreview'
+          type: array
+        empty:
+          type: boolean
+        first:
+          type: boolean
+        last:
+          type: boolean
+        number:
+          format: int32
+          type: integer
+        numberOfElements:
+          format: int32
+          type: integer
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        size:
+          format: int32
+          type: integer
+        sort:
+          $ref: '#/components/schemas/Sort'
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      title: Page«EmailPreview»
+      type: object
+    Page«EmailProjection»:
+      example:
+        number: 0
+        last: true
+        numberOfElements: 6
+        size: 1
+        totalPages: 5
+        pageable:
+          paged: true
+          pageNumber: 5
+          offset: 1
+          pageSize: 5
+          unpaged: true
+          sort:
+            unsorted: true
+            sorted: true
+            empty: true
+        sort:
+          unsorted: true
+          sorted: true
+          empty: true
+        content:
+        - cc:
+          - cc
+          - cc
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          attachments:
+          - attachments
+          - attachments
+          bcc:
+          - bcc
+          - bcc
+          read: true
+          subject: subject
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          to:
+          - to
+          - to
+          inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - cc:
+          - cc
+          - cc
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          attachments:
+          - attachments
+          - attachments
+          bcc:
+          - bcc
+          - bcc
+          read: true
+          subject: subject
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          to:
+          - to
+          - to
+          inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        first: true
+        empty: true
+        totalElements: 5
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/EmailProjection'
+          type: array
+        empty:
+          type: boolean
+        first:
+          type: boolean
+        last:
+          type: boolean
+        number:
+          format: int32
+          type: integer
+        numberOfElements:
+          format: int32
+          type: integer
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        size:
+          format: int32
+          type: integer
+        sort:
+          $ref: '#/components/schemas/Sort'
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      title: Page«EmailProjection»
+      type: object
+    Page«GroupProjection»:
+      example:
+        number: 0
+        last: true
+        numberOfElements: 6
+        size: 1
+        totalPages: 5
+        pageable:
+          paged: true
+          pageNumber: 5
+          offset: 1
+          pageSize: 5
+          unpaged: true
+          sort:
+            unsorted: true
+            sorted: true
+            empty: true
+        sort:
+          unsorted: true
+          sorted: true
+          empty: true
+        content:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          name: name
+          description: description
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          name: name
+          description: description
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        first: true
+        empty: true
+        totalElements: 5
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/GroupProjection'
+          type: array
+        empty:
+          type: boolean
+        first:
+          type: boolean
+        last:
+          type: boolean
+        number:
+          format: int32
+          type: integer
+        numberOfElements:
+          format: int32
+          type: integer
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        size:
+          format: int32
+          type: integer
+        sort:
+          $ref: '#/components/schemas/Sort'
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      title: Page«GroupProjection»
+      type: object
+    Page«InboxProjection»:
+      example:
+        number: 0
+        last: true
+        numberOfElements: 6
+        size: 1
+        totalPages: 5
+        pageable:
+          paged: true
+          pageNumber: 5
+          offset: 1
+          pageSize: 5
+          unpaged: true
+          sort:
+            unsorted: true
+            sorted: true
+            empty: true
+        sort:
+          unsorted: true
+          sorted: true
+          empty: true
+        content:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          emailAddress: emailAddress
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          favourite: true
+          expiresAt: 2000-01-23T04:56:07.000+00:00
+          tags:
+          - tags
+          - tags
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          emailAddress: emailAddress
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          favourite: true
+          expiresAt: 2000-01-23T04:56:07.000+00:00
+          tags:
+          - tags
+          - tags
+        first: true
+        empty: true
+        totalElements: 5
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/InboxProjection'
+          type: array
+        empty:
+          type: boolean
+        first:
+          type: boolean
+        last:
+          type: boolean
+        number:
+          format: int32
+          type: integer
+        numberOfElements:
+          format: int32
+          type: integer
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        size:
+          format: int32
+          type: integer
+        sort:
+          $ref: '#/components/schemas/Sort'
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      title: Page«InboxProjection»
+      type: object
+    Page«TemplateProjection»:
+      example:
+        number: 0
+        last: true
+        numberOfElements: 6
+        size: 1
+        totalPages: 5
+        pageable:
+          paged: true
+          pageNumber: 5
+          offset: 1
+          pageSize: 5
+          unpaged: true
+          sort:
+            unsorted: true
+            sorted: true
+            empty: true
+        sort:
+          unsorted: true
+          sorted: true
+          empty: true
+        content:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          variables:
+          - variables
+          - variables
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          variables:
+          - variables
+          - variables
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        first: true
+        empty: true
+        totalElements: 5
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/TemplateProjection'
+          type: array
+        empty:
+          type: boolean
+        first:
+          type: boolean
+        last:
+          type: boolean
+        number:
+          format: int32
+          type: integer
+        numberOfElements:
+          format: int32
+          type: integer
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        size:
+          format: int32
+          type: integer
+        sort:
+          $ref: '#/components/schemas/Sort'
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      title: Page«TemplateProjection»
+      type: object
+    Page«WebhookProjection»:
+      example:
+        number: 0
+        last: true
+        numberOfElements: 6
+        size: 1
+        totalPages: 5
+        pageable:
+          paged: true
+          pageNumber: 5
+          offset: 1
+          pageSize: 5
+          unpaged: true
+          sort:
+            unsorted: true
+            sorted: true
+            empty: true
+        sort:
+          unsorted: true
+          sorted: true
+          empty: true
+        content:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          url: url
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          url: url
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        first: true
+        empty: true
+        totalElements: 5
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/WebhookProjection'
+          type: array
+        empty:
+          type: boolean
+        first:
+          type: boolean
+        last:
+          type: boolean
+        number:
+          format: int32
+          type: integer
+        numberOfElements:
+          format: int32
+          type: integer
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        size:
+          format: int32
+          type: integer
+        sort:
+          $ref: '#/components/schemas/Sort'
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      title: Page«WebhookProjection»
+      type: object
+    SendEmailOptions:
+      description: Options for sending an email message from an inbox. Must supply
+        either list of `to` email addresses or `toGroups` list of Contact Group IDs.
+      example:
+        cc:
+        - cc
+        - cc
+        template: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        charset: charset
+        attachments:
+        - attachments
+        - attachments
+        bcc:
+        - bcc
+        - bcc
+        subject: subject
+        body: body
+        templateVariables: '{}'
+        toContacts:
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        isHTML: true
+        replyTo: replyTo
+        from: from
+        to:
+        - to
+        - to
+        toGroup: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        attachments:
+          description: Optional list of attachment IDs to send with this email. You
+            must first upload each attachment separately in order to obtain attachment
+            IDs
+          items:
+            type: string
+          type: array
+        bcc:
+          description: Optional list of bcc destination email addresses
+          items:
+            type: string
+          type: array
+        body:
+          description: Contents of email. If body contains HTML then set `isHTML`
+            to true. You can use moustache template syntax in the body in conjunction
+            with `toGroup` contact variables or `templateVariables` data.
+          type: string
+        cc:
+          description: Optional list of cc destination email addresses
+          items:
+            type: string
+          type: array
+        charset:
+          description: Optional charset
+          type: string
+        from:
+          description: Optional from address. If not set source inbox address will
+            be used
+          type: string
+        isHTML:
+          description: Optional HTML flag. If true the `content-type` of the email
+            will be `text/html`
+          type: boolean
+        replyTo:
+          description: Optional replyTo header
+          type: string
+        subject:
+          description: Optional email subject line
+          type: string
+        template:
+          description: Optional template ID to use for body. Will override body if
+            provided
+          format: uuid
+          type: string
+        templateVariables:
+          description: Optional map of template variables. Will replace moustache
+            syntax variables in subject and body or template with the associated values
+          properties: {}
+          type: object
+        to:
+          description: List of destination email addresses. Even single recipients
+            must be in array form. Max 100 recipients.
+          items:
+            type: string
+          type: array
+        toContacts:
+          description: Optional list of contact IDs to send email to
+          items:
+            format: uuid
+            type: string
+          type: array
+        toGroup:
+          description: Optional contact group ID to send email to
+          format: uuid
+          type: string
+      title: SendEmailOptions
+      type: object
+    SetInboxFavouritedOptions:
+      example:
+        state: true
+      properties:
+        state:
+          type: boolean
+      title: SetInboxFavouritedOptions
+      type: object
+    Sort:
+      example:
+        unsorted: true
+        sorted: true
+        empty: true
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+      title: Sort
+      type: object
+    TemplateDto:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        variables:
+        - variableType: STRING
+          name: name
+        - variableType: STRING
+          name: name
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        content: content
+      properties:
+        content:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        variables:
+          items:
+            $ref: '#/components/schemas/TemplateVariable'
+          type: array
+      required:
+      - content
+      - createdAt
+      - id
+      - name
+      - variables
+      title: TemplateDto
+      type: object
+    TemplateProjection:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        variables:
+        - variables
+        - variables
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        variables:
+          items:
+            type: string
+          type: array
+      required:
+      - createdAt
+      - id
+      - name
+      - updatedAt
+      - variables
+      title: TemplateProjection
+      type: object
+    TemplateVariable:
+      example:
+        variableType: STRING
+        name: name
+      properties:
+        name:
+          type: string
+        variableType:
+          enum:
+          - STRING
+          type: string
+      required:
+      - name
+      - variableType
+      title: TemplateVariable
+      type: object
+    UpdateGroupContacts:
+      example:
+        contactIds:
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        contactIds:
+          items:
+            format: uuid
+            type: string
+          type: array
+      required:
+      - contactIds
+      title: UpdateGroupContacts
+      type: object
+    UploadAttachmentOptions:
+      description: Options for uploading files for attachments
+      example:
+        filename: filename
+        base64Contents: base64Contents
+        contentType: contentType
+      properties:
+        base64Contents:
+          description: Base64 encoded string of file contents
+          type: string
+        contentType:
+          description: Optional contentType for file. For instance application/pdf
+          type: string
+        filename:
+          description: Optional filename to save upload with
+          type: string
+      title: UploadAttachmentOptions
+      type: object
+    ValidationDto:
+      example:
+        emailId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        html:
+          isValid: true
+          warnings:
+          - lineNumber: 0
+            message: message
+          - lineNumber: 0
+            message: message
+          errors:
+          - lineNumber: 0
+            message: message
+          - lineNumber: 0
+            message: message
+      properties:
+        emailId:
+          format: uuid
+          type: string
+        html:
+          $ref: '#/components/schemas/HTMLValidationResult'
+      required:
+      - emailId
+      - html
+      title: ValidationDto
+      type: object
+    ValidationMessage:
+      example:
+        lineNumber: 0
+        message: message
+      properties:
+        lineNumber:
+          format: int32
+          type: integer
+        message:
+          type: string
+      required:
+      - lineNumber
+      title: ValidationMessage
+      type: object
+    WebhookDto:
+      description: 'Representation of a webhook for an inbox. The URL that '
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        method: GET
+        basicAuth: true
+        payloadJsonSchema: payloadJsonSchema
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        url: url
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        basicAuth:
+          description: Does webhook expect basic authentication? If true it means
+            you created this webhook with a username and password. MailSlurp will
+            use these in the URL to authenticate itself.
+          type: boolean
+        createdAt:
+          description: When the webhook was created
+          format: date-time
+          type: string
+        id:
+          description: ID of the Webhook
+          format: uuid
+          type: string
+        inboxId:
+          description: The inbox that the Webhook will be triggered by
+          format: uuid
+          type: string
+        method:
+          description: HTTP method that your server endpoint must listen for
+          enum:
+          - GET
+          - HEAD
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+          - TRACE
+          type: string
+        name:
+          description: Name of the webhook
+          type: string
+        payloadJsonSchema:
+          description: JSON Schema for the payload that will be sent to your URL via
+            the HTTP method described.
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        url:
+          description: URL of your server that the webhook will be sent to. The schema
+            of the JSON that is sent is described by the payloadJsonSchema.
+          type: string
+      required:
+      - updatedAt
+      title: WebhookDto
+      type: object
+    WebhookProjection:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        url: url
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        inboxId:
+          format: uuid
+          type: string
+        name:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        url:
+          type: string
+      required:
+      - createdAt
+      - id
+      - inboxId
+      - updatedAt
+      - url
+      title: WebhookProjection
+      type: object
+    WebhookTestRequest:
+      example:
+        headers:
+          key: headers
+        method: GET
+        payload: payload
+        url: url
+      properties:
+        headers:
+          additionalProperties:
+            type: string
+          type: object
+        method:
+          enum:
+          - GET
+          - HEAD
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+          - TRACE
+          type: string
+        payload:
+          type: string
+        url:
+          type: string
+      required:
+      - headers
+      - method
+      - url
+      title: WebhookTestRequest
+      type: object
+    WebhookTestResponse:
+      example:
+        message: message
+        statusCode: 0
+      properties:
+        message:
+          type: string
+        statusCode:
+          format: int32
+          type: integer
+      title: WebhookTestResponse
+      type: object
+    WebhookTestResult:
+      example:
+        request:
+          headers:
+            key: headers
+          method: GET
+          payload: payload
+          url: url
+        response:
+          message: message
+          statusCode: 0
+        message: message
+      properties:
+        message:
+          type: string
+        request:
+          $ref: '#/components/schemas/WebhookTestRequest'
+        response:
+          $ref: '#/components/schemas/WebhookTestResponse'
+      required:
+      - request
+      - response
+      title: WebhookTestResult
       type: object
   securitySchemes:
     API_KEY:
