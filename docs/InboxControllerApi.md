@@ -6,14 +6,15 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**CreateInbox**](InboxControllerApi.md#CreateInbox) | **Post** /inboxes | Create an Inbox (email address)
 [**DeleteAllInboxes**](InboxControllerApi.md#DeleteAllInboxes) | **Delete** /inboxes | Delete all inboxes
-[**DeleteInbox**](InboxControllerApi.md#DeleteInbox) | **Delete** /inboxes/{inboxId} | Delete Inbox / Email Address
+[**DeleteInbox**](InboxControllerApi.md#DeleteInbox) | **Delete** /inboxes/{inboxId} | Delete inbox
 [**GetAllInboxes**](InboxControllerApi.md#GetAllInboxes) | **Get** /inboxes/paginated | List Inboxes Paginated
 [**GetEmails**](InboxControllerApi.md#GetEmails) | **Get** /inboxes/{inboxId}/emails | Get emails in an Inbox
-[**GetInbox**](InboxControllerApi.md#GetInbox) | **Get** /inboxes/{inboxId} | Get Inbox / EmailAddress
+[**GetInbox**](InboxControllerApi.md#GetInbox) | **Get** /inboxes/{inboxId} | Get Inbox
 [**GetInboxEmailsPaginated**](InboxControllerApi.md#GetInboxEmailsPaginated) | **Get** /inboxes/{inboxId}/emails/paginated | Get inbox emails paginated
 [**GetInboxes**](InboxControllerApi.md#GetInboxes) | **Get** /inboxes | List Inboxes / Email Addresses
 [**SendEmail**](InboxControllerApi.md#SendEmail) | **Post** /inboxes/{inboxId} | Send Email
 [**SetInboxFavourited**](InboxControllerApi.md#SetInboxFavourited) | **Put** /inboxes/{inboxId}/favourite | Set inbox favourited state
+[**UpdateInbox**](InboxControllerApi.md#UpdateInbox) | **Patch** /inboxes/{inboxId} | Update Inbox
 
 
 
@@ -23,7 +24,7 @@ Method | HTTP request | Description
 
 Create an Inbox (email address)
 
-Create a new inbox and with a ranmdomized email address to send and receive from. Pass emailAddress parameter if you wish to use a specific email address. Creating an inbox is required before sending or receiving emails. If writing tests it is recommended that you create a new inbox during each test method so that it is unique and empty. 
+Create a new inbox and with a randomized email address to send and receive from. Pass emailAddress parameter if you wish to use a specific email address. Creating an inbox is required before sending or receiving emails. If writing tests it is recommended that you create a new inbox during each test method so that it is unique and empty. 
 
 ### Required Parameters
 
@@ -71,7 +72,7 @@ Name | Type | Description  | Notes
 
 Delete all inboxes
 
-Permanently delete all inboxes and associated email addresses and all emails within the given inboxes
+Permanently delete all inboxes and associated email addresses. This will also delete all emails within the inboxes. Be careful as inboxes cannot be recovered once deleted. Note: deleting inboxes will not impact your usage limits. Monthly inbox creation limits are based on how many inboxes were created in the last 30 days, not how many inboxes you currently have.
 
 ### Required Parameters
 
@@ -99,9 +100,9 @@ This endpoint does not need any parameter.
 
 > DeleteInbox(ctx, inboxId)
 
-Delete Inbox / Email Address
+Delete inbox
 
-Permanently delete an inbox and associated email address and all emails within the given inboxes
+Permanently delete an inbox and associated email address aswell as all emails within the given inbox. This action cannot be undone. Note: deleting an inbox will not affect your account usage. Monthly inbox usage is based on how many inboxes you create within 30 days, not how many exist at time of request.
 
 ### Required Parameters
 
@@ -229,7 +230,7 @@ Name | Type | Description  | Notes
 
 > Inbox GetInbox(ctx, inboxId)
 
-Get Inbox / EmailAddress
+Get Inbox
 
 Returns an inbox's properties, including its email address and ID.
 
@@ -342,7 +343,7 @@ This endpoint does not need any parameter.
 
 Send Email
 
-Send an email from the inbox's email address. Specify the email recipients and contents in the request body. See the `SendEmailOptions` for more information. Note the `inboxId` refers to the inbox's id NOT its email address
+Send an email from an inbox's email address.  The request body should contain the `SendEmailOptions` that include recipients, attachments, body etc. See `SendEmailOptions` for all available properties. Note the `inboxId` refers to the inbox's id not the inbox's email address. See https://www.mailslurp.com/guides/ for more information on how to send emails.
 
 ### Required Parameters
 
@@ -397,6 +398,41 @@ Name | Type | Description  | Notes
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **inboxId** | [**string**](.md)| inboxId | 
 **setInboxFavouritedOptions** | [**SetInboxFavouritedOptions**](SetInboxFavouritedOptions.md)| setInboxFavouritedOptions | 
+
+### Return type
+
+[**Inbox**](Inbox.md)
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## UpdateInbox
+
+> Inbox UpdateInbox(ctx, inboxId, updateInboxOptions)
+
+Update Inbox
+
+Update editable fields on an inbox
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**inboxId** | [**string**](.md)| inboxId | 
+**updateInboxOptions** | [**UpdateInboxOptions**](UpdateInboxOptions.md)| updateInboxOptions | 
 
 ### Return type
 

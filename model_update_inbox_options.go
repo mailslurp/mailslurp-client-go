@@ -11,15 +11,16 @@ package mailslurp
 import (
 	"time"
 )
-// EmailProjection struct for EmailProjection
-type EmailProjection struct {
-	Attachments []string `json:"attachments,omitempty"`
-	Bcc []string `json:"bcc,omitempty"`
-	Cc []string `json:"cc,omitempty"`
-	CreatedAt time.Time `json:"createdAt"`
-	Id string `json:"id"`
-	InboxId string `json:"inboxId"`
-	Read bool `json:"read,omitempty"`
-	Subject string `json:"subject,omitempty"`
-	To []string `json:"to"`
+// UpdateInboxOptions Options for updating inbox properties
+type UpdateInboxOptions struct {
+	// Optional description of an inbox for labelling purposes
+	Description string `json:"description,omitempty"`
+	// When, if ever, will the inbox expire and be deleted. If null then this inbox is permanent and the emails in it won't be deleted.
+	ExpiresAt time.Time `json:"expiresAt,omitempty"`
+	// Is the inbox favourited
+	Favourite bool `json:"favourite,omitempty"`
+	// Optional name of the inbox. Displayed in the dashboard for easier search
+	Name string `json:"name,omitempty"`
+	// Tags that inbox has been tagged with
+	Tags []string `json:"tags,omitempty"`
 }

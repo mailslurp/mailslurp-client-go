@@ -5,14 +5,17 @@ All URIs are relative to *https://api.mailslurp.com*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**DeleteAllEmails**](EmailControllerApi.md#DeleteAllEmails) | **Delete** /emails | Delete all emails
-[**DeleteEmail**](EmailControllerApi.md#DeleteEmail) | **Delete** /emails/{emailId} | Delete Email
-[**DownloadAttachment**](EmailControllerApi.md#DownloadAttachment) | **Get** /emails/{emailId}/attachments/{attachmentId} | Get email attachment
-[**ForwardEmail**](EmailControllerApi.md#ForwardEmail) | **Post** /emails/{emailId}/forward | Forward Email
+[**DeleteEmail**](EmailControllerApi.md#DeleteEmail) | **Delete** /emails/{emailId} | Delete an email
+[**DownloadAttachment**](EmailControllerApi.md#DownloadAttachment) | **Get** /emails/{emailId}/attachments/{attachmentId} | Get email attachment bytes
+[**ForwardEmail**](EmailControllerApi.md#ForwardEmail) | **Post** /emails/{emailId}/forward | Forward email
 [**GetAttachmentMetaData**](EmailControllerApi.md#GetAttachmentMetaData) | **Get** /emails/{emailId}/attachments/{attachmentId}/metadata | Get email attachment metadata
 [**GetAttachments**](EmailControllerApi.md#GetAttachments) | **Get** /emails/{emailId}/attachments | Get all email attachment metadata
-[**GetEmail**](EmailControllerApi.md#GetEmail) | **Get** /emails/{emailId} | Get Email Content
+[**GetEmail**](EmailControllerApi.md#GetEmail) | **Get** /emails/{emailId} | Get email content
+[**GetEmailHTML**](EmailControllerApi.md#GetEmailHTML) | **Get** /emails/{emailId}/html | Get email content as HTML
 [**GetEmailsPaginated**](EmailControllerApi.md#GetEmailsPaginated) | **Get** /emails | Get all emails
-[**GetRawEmailContents**](EmailControllerApi.md#GetRawEmailContents) | **Get** /emails/{emailId}/raw | Get Raw Email Content
+[**GetRawEmailContents**](EmailControllerApi.md#GetRawEmailContents) | **Get** /emails/{emailId}/raw | Get raw email string
+[**GetRawEmailJson**](EmailControllerApi.md#GetRawEmailJson) | **Get** /emails/{emailId}/raw/json | Get raw email in JSON
+[**GetUnreadEmailCount**](EmailControllerApi.md#GetUnreadEmailCount) | **Get** /emails/unreadCount | Get unread email count
 [**ValidateEmail**](EmailControllerApi.md#ValidateEmail) | **Post** /emails/{emailId}/validate | Validate email
 
 
@@ -23,7 +26,7 @@ Method | HTTP request | Description
 
 Delete all emails
 
-Deletes all emails
+Deletes all emails in your account. Be careful as emails cannot be recovered
 
 ### Required Parameters
 
@@ -51,9 +54,9 @@ This endpoint does not need any parameter.
 
 > DeleteEmail(ctx, emailId)
 
-Delete Email
+Delete an email
 
-Deletes an email and removes it from the inbox
+Deletes an email and removes it from the inbox. Deleted emails cannot be recovered.
 
 ### Required Parameters
 
@@ -85,9 +88,9 @@ Name | Type | Description  | Notes
 
 > string DownloadAttachment(ctx, attachmentId, emailId, optional)
 
-Get email attachment
+Get email attachment bytes
 
-Returns the specified attachment for a given email as a byte stream (file download). Get the attachmentId from the email response.
+Returns the specified attachment for a given email as a byte stream (file download). You can find attachment ids in email responses endpoint responses. The response type is application/octet-stream.
 
 ### Required Parameters
 
@@ -132,9 +135,9 @@ Name | Type | Description  | Notes
 
 > ForwardEmail(ctx, emailId, forwardEmailOptions)
 
-Forward Email
+Forward email
 
-Forward email content to given recipients
+Forward an existing email to new recipients.
 
 ### Required Parameters
 
@@ -234,11 +237,11 @@ Name | Type | Description  | Notes
 
 ## GetEmail
 
-> Email GetEmail(ctx, emailId)
+> Email GetEmail(ctx, emailId, optional)
 
-Get Email Content
+Get email content
 
-Returns a email summary object with headers and content. To retrieve the raw unparsed email use the getRawMessage endpoint
+Returns a email summary object with headers and content. To retrieve the raw unparsed email use the getRawEmail endpoints
 
 ### Required Parameters
 
@@ -247,6 +250,17 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **emailId** | [**string**](.md)| emailId | 
+ **optional** | ***GetEmailOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a GetEmailOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **decode** | **optional.Bool**| Decode email body quoted-printable encoding to plain text. SMTP servers often encode text using quoted-printable format (for instance &#x60;&#x3D;D7&#x60;). This can be a pain for testing | [default to false]
 
 ### Return type
 
@@ -266,13 +280,58 @@ Name | Type | Description  | Notes
 [[Back to README]](../README.md)
 
 
+## GetEmailHTML
+
+> string GetEmailHTML(ctx, emailId, optional)
+
+Get email content as HTML
+
+Retrieve email content as HTML response for viewing in browsers. Decodes quoted-printable entities and converts charset to UTF-8. Pass your API KEY as a request parameter when viewing in a browser: `?apiKey=xxx`
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**emailId** | [**string**](.md)| emailId | 
+ **optional** | ***GetEmailHTMLOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a GetEmailHTMLOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **decode** | **optional.Bool**| decode | [default to false]
+
+### Return type
+
+**string**
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: text/html
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
 ## GetEmailsPaginated
 
 > PageEmailProjection GetEmailsPaginated(ctx, optional)
 
 Get all emails
 
-Responses are paginated
+By default returns all emails across all inboxes sorted by ascending created at date. Responses are paginated. You can restrict results to a list of inbox IDs. You can also filter out read messages
 
 ### Required Parameters
 
@@ -289,11 +348,11 @@ Optional parameters are passed through a pointer to a GetEmailsPaginatedOpts str
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **inboxId** | [**optional.Interface of []string**](string.md)| Optional inbox ids to filter by. Can be repeated | 
+ **inboxId** | [**optional.Interface of []string**](string.md)| Optional inbox ids to filter by. Can be repeated. By default will use all inboxes belonging to your account. | 
  **page** | **optional.Int32**| Optional page index in email list pagination | [default to 0]
  **size** | **optional.Int32**| Optional page size in email list pagination | [default to 20]
  **sort** | **optional.String**| Optional createdAt sort direction ASC or DESC | [default to ASC]
- **unreadOnly** | **optional.Bool**| Optional filter for unread emails only | [default to false]
+ **unreadOnly** | **optional.Bool**| Optional filter for unread emails only. All emails are considered unread until they are viewed in the dashboard or requested directly | [default to false]
 
 ### Return type
 
@@ -317,9 +376,9 @@ Name | Type | Description  | Notes
 
 > string GetRawEmailContents(ctx, emailId)
 
-Get Raw Email Content
+Get raw email string
 
-Returns a raw, unparsed and unprocessed email
+Returns a raw, unparsed, and unprocessed email. If your client has issues processing the response it is likely due to the response content-type which is text/plain. If you need a JSON response content-type use the getRawEmailJson endpoint
 
 ### Required Parameters
 
@@ -347,13 +406,77 @@ Name | Type | Description  | Notes
 [[Back to README]](../README.md)
 
 
+## GetRawEmailJson
+
+> RawEmailJson GetRawEmailJson(ctx, emailId)
+
+Get raw email in JSON
+
+Returns a raw, unparsed, and unprocessed email wrapped in a JSON response object for easier handling when compared with the getRawEmail text/plain response
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**emailId** | [**string**](.md)| emailId | 
+
+### Return type
+
+[**RawEmailJson**](RawEmailJson.md)
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## GetUnreadEmailCount
+
+> UnreadCount GetUnreadEmailCount(ctx, )
+
+Get unread email count
+
+Get number of emails unread
+
+### Required Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**UnreadCount**](UnreadCount.md)
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
 ## ValidateEmail
 
 > ValidationDto ValidateEmail(ctx, emailId)
 
 Validate email
 
-Validate HTML content of email
+Validate the HTML content of email if HTML is found. Considered valid if no HTML.
 
 ### Required Parameters
 

@@ -8,8 +8,20 @@
  */
 
 package mailslurp
-// MatchOptions Optional filter for matching emails based on fields
-type MatchOptions struct {
-	// 1 or more match options. Options are additive so if one does not match the email is excluded from results
+// WaitForConditions struct for WaitForConditions
+type WaitForConditions struct {
+	// Number of results that should match conditions
+	Count int32 `json:"count,omitempty"`
+	// Should exactly count number of results be returned or at least that many.
+	CountType string `json:"countType,omitempty"`
+	// Inbox to search within
+	InboxId string `json:"inboxId,omitempty"`
+	// Conditions that should be matched
 	Matches []MatchOption `json:"matches,omitempty"`
+	// Direction to sort matching emails by created time
+	SortDirection string `json:"sortDirection,omitempty"`
+	// Max time in milliseconds to wait until conditions are met
+	Timeout int64 `json:"timeout,omitempty"`
+	// Apply only to unread emails
+	UnreadOnly bool `json:"unreadOnly,omitempty"`
 }

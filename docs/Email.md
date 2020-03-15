@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **Cc** | **[]string** | List of &#x60;CC&#x60; recipients email was addressed to | [optional] 
 **Charset** | **string** | Detected character set of the email body such as UTF-8 | [optional] 
 **CreatedAt** | [**time.Time**](time.Time.md) | When was the email received by MailSlurp | [optional] 
-**From** | **string** | Who was the email sent from | [optional] 
+**From** | **string** | Who the email was sent from | [optional] 
 **Headers** | **map[string]string** |  | [optional] 
 **Id** | **string** | ID of the email | [optional] 
 **InboxId** | **string** | ID of the inbox that received the email | [optional] 

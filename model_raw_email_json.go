@@ -8,18 +8,7 @@
  */
 
 package mailslurp
-import (
-	"time"
-)
-// EmailProjection struct for EmailProjection
-type EmailProjection struct {
-	Attachments []string `json:"attachments,omitempty"`
-	Bcc []string `json:"bcc,omitempty"`
-	Cc []string `json:"cc,omitempty"`
-	CreatedAt time.Time `json:"createdAt"`
-	Id string `json:"id"`
-	InboxId string `json:"inboxId"`
-	Read bool `json:"read,omitempty"`
-	Subject string `json:"subject,omitempty"`
-	To []string `json:"to"`
+// RawEmailJson struct for RawEmailJson
+type RawEmailJson struct {
+	Content string `json:"content"`
 }
