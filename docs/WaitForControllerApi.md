@@ -107,7 +107,7 @@ Name | Type | Description  | Notes
 
 Fetch inbox's latest email or if empty wait for an email to arrive
 
-Will return either the last received email or wait for an email to arrive and return that. If you need to wait for an email for a non-empty inbox see the other receive methods such as waitForNthEmail or waitForEmailCount.
+Will return either the last received email or wait for an email to arrive and return that. If you need to wait for an email for a non-empty inbox set `unreadOnly=true` or see the other receive methods such as `waitForNthEmail` or `waitForEmailCount`.
 
 ### Required Parameters
 
@@ -126,7 +126,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **inboxId** | [**optional.Interface of string**](.md)| Id of the inbox we are fetching emails from | 
  **timeout** | **optional.Int64**| Max milliseconds to wait | 
- **unreadOnly** | **optional.Bool**| Optional filter for unread only | [default to false]
+ **unreadOnly** | **optional.Bool**| Optional filter for unread only. | [default to false]
 
 ### Return type
 

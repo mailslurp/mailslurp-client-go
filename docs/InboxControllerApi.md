@@ -11,6 +11,7 @@ Method | HTTP request | Description
 [**GetEmails**](InboxControllerApi.md#GetEmails) | **Get** /inboxes/{inboxId}/emails | Get emails in an Inbox
 [**GetInbox**](InboxControllerApi.md#GetInbox) | **Get** /inboxes/{inboxId} | Get Inbox
 [**GetInboxEmailsPaginated**](InboxControllerApi.md#GetInboxEmailsPaginated) | **Get** /inboxes/{inboxId}/emails/paginated | Get inbox emails paginated
+[**GetInboxTags**](InboxControllerApi.md#GetInboxTags) | **Get** /inboxes/tags | Get inbox tags
 [**GetInboxes**](InboxControllerApi.md#GetInboxes) | **Get** /inboxes | List Inboxes / Email Addresses
 [**SendEmail**](InboxControllerApi.md#SendEmail) | **Post** /inboxes/{inboxId} | Send Email
 [**SetInboxFavourited**](InboxControllerApi.md#SetInboxFavourited) | **Put** /inboxes/{inboxId}/favourite | Set inbox favourited state
@@ -158,6 +159,7 @@ Name | Type | Description  | Notes
  **search** | **optional.String**| Optionally filter by search words partial matching ID, tags, name, and email address | 
  **size** | **optional.Int32**| Optional page size in inbox list pagination | [default to 20]
  **sort** | **optional.String**| Optional createdAt sort direction ASC or DESC | [default to ASC]
+ **tag** | **optional.String**| Optionally filter by tags | 
 
 ### Return type
 
@@ -292,6 +294,36 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**PageEmailPreview**](Page«EmailPreview».md)
+
+### Authorization
+
+[API_KEY](../README.md#API_KEY)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## GetInboxTags
+
+> []string GetInboxTags(ctx, )
+
+Get inbox tags
+
+Get all inbox tags
+
+### Required Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+**[]string**
 
 ### Authorization
 

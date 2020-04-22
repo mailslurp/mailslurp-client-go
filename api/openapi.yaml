@@ -7,10 +7,14 @@ info:
     \ [API KEY](https://app.mailslurp.com/sign-up/)\n- Generated [SDK Clients](https://www.mailslurp.com/docs/)\n\
     - [Examples](https://github.com/mailslurp/examples) repository\n"
   title: MailSlurp API
-  version: 67c9a1eda264be4cfe0bb2c76151f0aadf0862bc
+  version: d1659dc1567a5b62f65d0612107a50aace03e085
 servers:
 - url: https://api.mailslurp.com/
 tags:
+- description: |
+    "Endpoints for creating, listing, and deleting email aliases.
+          Email aliases can be used to hide real email addresses behind an alias. If you wish to receive emails with an alias attach an inbox to the alias. Whenever the inbox receives an email the email will be forwarded to the alias email address.
+  name: Alias Controller
 - description: Endpoints for uploading attachments. See the EmailController for downloading
     attachments.
   name: Attachment Controller
@@ -34,6 +38,8 @@ tags:
     \ access the body or attachments of an email you need to use the getEmail and\
     \ getAttachment endpoints with specific inbox and email IDs.\n    "
   name: Email Controller
+- description: Form controller for submitting emailable forms
+  name: Form Controller
 - description: Endpoints for managing groups. Groups can be used for sending emails
     to individuals and groups.
   name: Group Controller
@@ -72,6 +78,232 @@ tags:
     server to fetch the full emails or attachments if you need them.
   name: Webhook Controller
 paths:
+  /aliases:
+    get:
+      deprecated: false
+      description: Get all email aliases in paginated form
+      operationId: getAliases
+      parameters:
+      - allowEmptyValue: false
+        description: Optional page index in alias list pagination
+        in: query
+        name: page
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional page size in alias list pagination
+        in: query
+        name: size
+        schema:
+          default: 20
+          format: int32
+          type: integer
+      - allowEmptyValue: false
+        description: Optional createdAt sort direction ASC or DESC
+        in: query
+        name: sort
+        schema:
+          default: ASC
+          enum:
+          - ASC
+          - DESC
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page«Alias»'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get all email aliases
+      tags:
+      - Alias Controller
+    post:
+      deprecated: false
+      description: Create an email alias belonging to a user ID. To create anonymous
+        aliases use the `createAnonymousAlias` method.
+      operationId: createAlias
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOwnedAliasOptions'
+        description: createOwnedAliasOptions
+        required: true
+      responses:
+        "201":
+          content: {}
+          description: Created
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alias'
+          description: Accepted
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Create an email alias
+      tags:
+      - Alias Controller
+      x-codegen-request-body-name: createOwnedAliasOptions
+  /aliases/anonymous:
+    post:
+      deprecated: false
+      operationId: createAnonymousAlias
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAnonymousAliasOptions'
+        description: createAnonymousAliasOptions
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alias'
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Create an anonymous email alias
+      tags:
+      - Alias Controller
+      x-codegen-request-body-name: createAnonymousAliasOptions
+  /aliases/{aliasId}:
+    delete:
+      deprecated: false
+      operationId: deleteAlias
+      parameters:
+      - description: aliasId
+        in: path
+        name: aliasId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "204":
+          content: {}
+          description: No Content
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+      security:
+      - API_KEY: []
+      summary: Delete an owned alias
+      tags:
+      - Alias Controller
+    get:
+      deprecated: false
+      description: Get an email alias by ID
+      operationId: getAlias
+      parameters:
+      - description: aliasId
+        in: path
+        name: aliasId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alias'
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get an email alias
+      tags:
+      - Alias Controller
+    put:
+      deprecated: false
+      operationId: updateAlias
+      parameters:
+      - description: aliasId
+        in: path
+        name: aliasId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOwnedAliasOptions'
+        description: createOwnedAliasOptions
+        required: true
+      responses:
+        "201":
+          content: {}
+          description: Created
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alias'
+          description: Accepted
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Update an owned alias
+      tags:
+      - Alias Controller
+      x-codegen-request-body-name: createOwnedAliasOptions
   /attachments:
     post:
       deprecated: false
@@ -130,6 +362,11 @@ paths:
         name: filename
         schema:
           type: string
+      - description: x-filename
+        in: query
+        name: x-filename
+        schema:
+          type: string
       requestBody:
         content:
           multipart/form-data:
@@ -165,6 +402,7 @@ paths:
       summary: Upload an attachment for sending using Multipart Form
       tags:
       - Attachment Controller
+      x-codegen-request-body-name: contentTypeHeader
   /bulk/inboxes:
     delete:
       deprecated: false
@@ -430,6 +668,32 @@ paths:
       summary: Get contact
       tags:
       - Contact Controller
+  /createInbox:
+    post:
+      deprecated: false
+      description: Returns an Inbox with an `id` and an `emailAddress`
+      operationId: createNewEmailAddress
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbox'
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Create new random inbox
+      tags:
+      - Common Actions Controller
   /domains:
     get:
       deprecated: false
@@ -1097,6 +1361,154 @@ paths:
       summary: Delete all emails in an inbox
       tags:
       - Common Actions Controller
+  /forms:
+    post:
+      deprecated: false
+      description: "This endpoint allows you to submit HTML forms and receive the\
+        \ field values and files via email. \n\n#### Parameters\nThe endpoint looks\
+        \ for special meta parameters in the form fields OR in the URL request parameters.\
+        \ The meta parameters can be used to specify the behaviour of the email. \n\
+        \nYou must provide at-least a `_to` email address or a `_toAlias` email alias\
+        \ ID to tell the endpoint where the form should be emailed. These can be submitted\
+        \ as hidden HTML input fields with the corresponding `name` attributes or\
+        \ as URL query parameters such as `?_to=test@example.com`\n\nThe endpoint\
+        \ takes all other form fields that are named and includes them in the message\
+        \ body of the email. Files are sent as attachments.\n\n#### Submitting\nThis\
+        \ endpoint accepts form submission via POST method. It accepts `application/x-www-form-urlencoded`,\
+        \ and `multipart/form-data` content-types.\n\n#### HTML Example\n```html\n\
+        <form \n  action=\"https://api.mailslurp.com/forms\"\n  method=\"post\"\n\
+        >\n  <input name=\"_to\" type=\"hidden\" value=\"test@example.com\"/>\n  <textarea\
+        \ name=\"feedback\"></textarea>\n  <button type=\"submit\">Submit</button>\n\
+        </form>\n```\n\n#### URL Example\n```html\n<form \n  action=\"https://api.mailslurp.com/forms?_toAlias=test@example.com\"\
+        \n  method=\"post\"\n>\n  <textarea name=\"feedback\"></textarea>\n  <button\
+        \ type=\"submit\">Submit</button>\n</form>\n```\n\n\n\nThe email address is\
+        \ specified by a `_to` field OR is extracted from an email alias specified\
+        \ by a `_toAlias` field (see the alias controller for more information). \n\
+        Endpoint accepts . \nYou can specify a content type in HTML forms using the\
+        \ `enctype` attribute, for instance: `<form enctype=\"multipart/form-data\"\
+        >`.\n\n"
+      operationId: submitForm
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                _emailAddress:
+                  description: Email address of the submitting user. Include this
+                    if you wish to record the submitters email address and reply to
+                    it later.
+                  example: test@example.com
+                  type: string
+                _redirectTo:
+                  description: Optional URL to redirect form submitter to after submission.
+                    If not present user will see a success message.
+                  example: https://mysite.com/form-success
+                  type: string
+                _spamCheck:
+                  description: Optional but recommended field that catches spammers
+                    out. Include as a hidden form field but LEAVE EMPTY. Spam-bots
+                    will usually fill every field. If the _spamCheck field is filled
+                    the form submission will be ignored.
+                  type: string
+                _subject:
+                  description: Optional subject of the email that will be sent.
+                  example: My form submission
+                  type: string
+                _successMessage:
+                  description: Optional success message to display if no _redirectTo
+                    present.
+                  example: Thanks for submitting
+                  type: string
+                _to:
+                  description: The email address that submitted form should be sent
+                    to. Either this or _toAlias must be present for a form to be successfully
+                    submitted..
+                  example: test@example.com
+                  type: string
+                _toAlias:
+                  description: ID of an email alias to that form should be sent to.
+                    Aliases must be created before submission and can be used to hide
+                    an email address and reduce spam.
+                  example: 873d822c-5598-47d1-a9a3-658b0dd82dc4
+                  type: string
+                otherParameters:
+                  description: All other parameters or fields will be accepted and
+                    attached to the sent email. This includes files and any HTML form
+                    field with a name. These fields will become the body of the email
+                    that is sent.
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                _emailAddress:
+                  description: Email address of the submitting user. Include this
+                    if you wish to record the submitters email address and reply to
+                    it later.
+                  example: test@example.com
+                  type: string
+                _redirectTo:
+                  description: Optional URL to redirect form submitter to after submission.
+                    If not present user will see a success message.
+                  example: https://mysite.com/form-success
+                  type: string
+                _spamCheck:
+                  description: Optional but recommended field that catches spammers
+                    out. Include as a hidden form field but LEAVE EMPTY. Spam-bots
+                    will usually fill every field. If the _spamCheck field is filled
+                    the form submission will be ignored.
+                  type: string
+                _subject:
+                  description: Optional subject of the email that will be sent.
+                  example: My form submission
+                  type: string
+                _successMessage:
+                  description: Optional success message to display if no _redirectTo
+                    present.
+                  example: Thanks for submitting
+                  type: string
+                _to:
+                  description: The email address that submitted form should be sent
+                    to. Either this or _toAlias must be present for a form to be successfully
+                    submitted..
+                  example: test@example.com
+                  type: string
+                _toAlias:
+                  description: ID of an email alias to that form should be sent to.
+                    Aliases must be created before submission and can be used to hide
+                    an email address and reduce spam.
+                  example: 873d822c-5598-47d1-a9a3-658b0dd82dc4
+                  type: string
+                otherParameters:
+                  description: All other parameters or fields will be accepted and
+                    attached to the sent email. This includes files and any HTML form
+                    field with a name. These fields will become the body of the email
+                    that is sent.
+                  type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+        "201":
+          content: {}
+          description: Created
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Submit a form to be parsed and sent as an email to an address determined
+        by the form fields
+      tags:
+      - Form Controller
   /groups:
     get:
       deprecated: false
@@ -1557,6 +1969,12 @@ paths:
           - ASC
           - DESC
           type: string
+      - allowEmptyValue: false
+        description: Optionally filter by tags
+        in: query
+        name: tag
+        schema:
+          type: string
       responses:
         "200":
           content:
@@ -1576,6 +1994,34 @@ paths:
       security:
       - API_KEY: []
       summary: List Inboxes Paginated
+      tags:
+      - Inbox Controller
+  /inboxes/tags:
+    get:
+      deprecated: false
+      description: Get all inbox tags
+      operationId: getInboxTags
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: OK
+        "401":
+          content: {}
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Forbidden
+        "404":
+          content: {}
+          description: Not Found
+      security:
+      - API_KEY: []
+      summary: Get inbox tags
       tags:
       - Inbox Controller
   /inboxes/{inboxId}:
@@ -2030,7 +2476,7 @@ paths:
     post:
       deprecated: false
       description: Returns an Inbox with an `id` and an `emailAddress`
-      operationId: createNewEmailAddress
+      operationId: createNewEmailAddress_1
       responses:
         "201":
           content:
@@ -2055,15 +2501,15 @@ paths:
   /sendEmail:
     post:
       deprecated: false
-      description: To specify an email address first create an inbox and use that
-        with the other send email methods
+      description: If no senderId or inboxId provided a random email address will
+        be used to send from.
       operationId: sendEmailSimple
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SendEmailOptions'
-        description: sendEmailOptions
+              $ref: '#/components/schemas/SimpleSendEmailOptions'
+        description: emailOptions
         required: true
       responses:
         "201":
@@ -2080,10 +2526,10 @@ paths:
           description: Not Found
       security:
       - API_KEY: []
-      summary: Send an email from a random email address
+      summary: Send an email
       tags:
       - Common Actions Controller
-      x-codegen-request-body-name: sendEmailOptions
+      x-codegen-request-body-name: emailOptions
   /templates:
     get:
       deprecated: false
@@ -2358,7 +2804,8 @@ paths:
       deprecated: false
       description: Will return either the last received email or wait for an email
         to arrive and return that. If you need to wait for an email for a non-empty
-        inbox see the other receive methods such as waitForNthEmail or waitForEmailCount.
+        inbox set `unreadOnly=true` or see the other receive methods such as `waitForNthEmail`
+        or `waitForEmailCount`.
       operationId: waitForLatestEmail
       parameters:
       - allowEmptyValue: false
@@ -2376,7 +2823,7 @@ paths:
           format: int64
           type: integer
       - allowEmptyValue: false
-        description: Optional filter for unread only
+        description: Optional filter for unread only.
         in: query
         name: unreadOnly
         schema:
@@ -2655,7 +3102,47 @@ paths:
       - Webhook Controller
 components:
   schemas:
+    Alias:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        emailAddress: emailAddress
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        proxied: true
+        inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        userId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        emailAddress:
+          type: string
+        id:
+          format: uuid
+          type: string
+        inboxId:
+          format: uuid
+          type: string
+        name:
+          type: string
+        proxied:
+          type: boolean
+        updatedAt:
+          format: date-time
+          type: string
+        userId:
+          format: uuid
+          type: string
+      required:
+      - createdAt
+      - emailAddress
+      - updatedAt
+      title: Alias
+      type: object
     AttachmentMetaData:
+      description: Meta data associated with an attachment. Attachments are stored
+        as byte blobs so the meta data is stored separately.
       example:
         name: name
         contentLength: 0
@@ -2663,19 +3150,18 @@ components:
         contentType: contentType
       properties:
         contentLength:
+          description: Size of attachment in bytes
           format: int64
           type: integer
         contentType:
+          description: Content type of attachment
           type: string
         id:
+          description: ID of attachment
           type: string
         name:
+          description: Name of attachment
           type: string
-      required:
-      - contentLength
-      - contentType
-      - id
-      - name
       title: AttachmentMetaData
       type: object
     BasicAuthOptions:
@@ -2695,7 +3181,8 @@ components:
       title: BasicAuthOptions
       type: object
     BulkSendEmailOptions:
-      description: Options for bulk sending an email from multiple addresses
+      description: Options for bulk sending an email from multiple addresses. See
+        regular `sendEmail` methods for more information.
       example:
         inboxIds:
         - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
@@ -2735,8 +3222,6 @@ components:
           type: array
         sendEmailOptions:
           $ref: '#/components/schemas/SendEmailOptions'
-      required:
-      - sendEmailOptions
       title: BulkSendEmailOptions
       type: object
     ContactDto:
@@ -2831,6 +3316,17 @@ components:
       - id
       title: ContactProjection
       type: object
+    CreateAnonymousAliasOptions:
+      description: Create anonymous email alias options. Email aliases can be used
+        to mask real email addresses behind an ID
+      example:
+        emailAddress: emailAddress
+      properties:
+        emailAddress:
+          description: Email address to be hidden behind alias
+          type: string
+      title: CreateAnonymousAliasOptions
+      type: object
     CreateContactOptions:
       example:
         firstName: firstName
@@ -2919,6 +3415,37 @@ components:
       required:
       - name
       title: CreateGroupOptions
+      type: object
+    CreateOwnedAliasOptions:
+      description: Create email alias options. Email aliases can be used to mask real
+        email addresses behind an ID. You can also attach an inbox to an alias so
+        that any email received by the inbox email address if forwarded to the alias
+        email address.
+      example:
+        emailAddress: emailAddress
+        name: name
+        proxied: true
+        inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        emailAddress:
+          description: Email address to be hidden behind alias
+          type: string
+        inboxId:
+          description: Optional inbox ID to attach to alias. Emails received by this
+            inbox will be forwarded to the alias email address
+          format: uuid
+          type: string
+        name:
+          description: Optional name for alias
+          type: string
+        proxied:
+          description: Optional proxied flag. When proxied is true alias will forward
+            the incoming emails to the aliased email address via a proxy inbox. A
+            new proxy is created for every new email thread. By replying to the proxy
+            you can correspond with using your email alias without revealing your
+            real email address.
+          type: boolean
+      title: CreateOwnedAliasOptions
       type: object
     CreateTemplateOptions:
       example:
@@ -3018,8 +3545,9 @@ components:
       title: DomainPreview
       type: object
     Email:
-      description: Representation of an email received by an inbox. Use the ID to
-        access more properties of an email using the EmailController endpoints.
+      description: Email model (also referred to as EmailDto). Represents an email
+        that was received by an inbox. If you want the original SMTP message see the
+        `getRawEmail` endpoint.
       example:
         cc:
         - cc
@@ -3122,7 +3650,8 @@ components:
       title: Email
       type: object
     EmailAnalysis:
-      description: Analysis of email
+      description: Analysis result for email. Each verdict property is a string PASS|FAIL|GRAY
+        or dynamic error message
       example:
         spamVerdict: spamVerdict
         virusVerdict: virusVerdict
@@ -3131,20 +3660,27 @@ components:
         dkimVerdict: dkimVerdict
       properties:
         dkimVerdict:
+          description: Verdict of DomainKeys Identified Mail analysis
           type: string
         dmarcVerdict:
+          description: Verdict of Domain-based Message Authentication Reporting and
+            Conformance analysis
           type: string
         spamVerdict:
+          description: Verdict of spam ranking analysis
           type: string
         spfVerdict:
+          description: Verdict of Send Policy Framework record spoofing analysis
           type: string
         virusVerdict:
+          description: Verdict of virus scan analysis
           type: string
       title: EmailAnalysis
       type: object
     EmailPreview:
-      description: Preview of an email message. For full message call the email endpoints
-        with the provided email id.
+      description: Preview of an email message. For full message (including body and
+        attachments) call the `getEmail` or other email endpoints with the provided
+        email ID.
       example:
         cc:
         - cc
@@ -3202,6 +3738,10 @@ components:
       title: EmailPreview
       type: object
     EmailProjection:
+      description: A compact representation of a full email. Used in list endpoints
+        to keep response sizes low. Body and attachments are not included. To get
+        all fields of the email use the `getEmail` method with the email projection's
+        ID. See `EmailDto` for documentation on projection properties.
       example:
         cc:
         - cc
@@ -3271,22 +3811,24 @@ components:
         - to
         - to
       properties:
-        to:
+        bcc:
+          description: Optional bcc recipients
+          items:
+            type: string
+          type: array
+        cc:
+          description: Optional cc recipients
           items:
             type: string
           type: array
         subject:
+          description: Subject for forwarded email
           type: string
-        cc:
+        to:
+          description: To recipients for forwarded email
           items:
             type: string
           type: array
-        bcc:
-          items:
-            type: string
-          type: array
-      required:
-      - to
       title: ForwardEmailOptions
       type: object
     GroupContactsDto:
@@ -3659,7 +4201,9 @@ components:
       title: MatchOption
       type: object
     MatchOptions:
-      description: Optional filter for matching emails based on fields
+      description: Optional filter for matching emails based on fields. For instance
+        filter results to only include emails whose `SUBJECT` value does `CONTAIN`
+        given match value.
       example:
         matches:
         - field: SUBJECT
@@ -3706,13 +4250,86 @@ components:
           type: boolean
       title: Pageable
       type: object
-    Page«ContactProjection»:
+    Page«Alias»:
       example:
         number: 0
         last: true
         numberOfElements: 6
         size: 2
         totalPages: 9
+        pageable:
+          paged: true
+          pageNumber: 5
+          offset: 1
+          pageSize: 5
+          unpaged: true
+          sort:
+            unsorted: true
+            sorted: true
+            empty: true
+        sort:
+          unsorted: true
+          sorted: true
+          empty: true
+        content:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          emailAddress: emailAddress
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          proxied: true
+          inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          userId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          emailAddress: emailAddress
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          proxied: true
+          inboxId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          userId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        first: true
+        empty: true
+        totalElements: 7
+      properties:
+        content:
+          items:
+            $ref: '#/components/schemas/Alias'
+          type: array
+        empty:
+          type: boolean
+        first:
+          type: boolean
+        last:
+          type: boolean
+        number:
+          format: int32
+          type: integer
+        numberOfElements:
+          format: int32
+          type: integer
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        size:
+          format: int32
+          type: integer
+        sort:
+          $ref: '#/components/schemas/Sort'
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+      title: Page«Alias»
+      type: object
+    Page«ContactProjection»:
+      example:
+        number: 0
+        last: true
+        numberOfElements: 6
+        size: 1
+        totalPages: 5
         pageable:
           paged: true
           pageNumber: 5
@@ -3742,7 +4359,7 @@ components:
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         first: true
         empty: true
-        totalElements: 7
+        totalElements: 5
       properties:
         content:
           items:
@@ -4375,6 +4992,28 @@ components:
           type: boolean
       title: SetInboxFavouritedOptions
       type: object
+    SimpleSendEmailOptions:
+      example:
+        senderId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        subject: subject
+        to: to
+        body: body
+      properties:
+        body:
+          description: Body of the email message. Supports HTML
+          type: string
+        senderId:
+          description: ID of inbox to send from
+          format: uuid
+          type: string
+        subject:
+          description: Subject line of the email
+          type: string
+        to:
+          description: Email address to send to
+          type: string
+      title: SimpleSendEmailOptions
+      type: object
     Sort:
       example:
         unsorted: true
@@ -4534,7 +5173,7 @@ components:
     UploadAttachmentOptions:
       description: Options for uploading files for attachments. When sending emails
         with the API that require attachments first upload each attachment. Then use
-        the returned attachment ID in your SendEmailOptions when sending an email.
+        the returned attachment ID in your `SendEmailOptions` when sending an email.
         This way you can use attachments multiple times once they have been uploaded.
       example:
         filename: filename
@@ -4553,6 +5192,7 @@ components:
       title: UploadAttachmentOptions
       type: object
     ValidationDto:
+      description: Response object for email validation operation
       example:
         emailId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         html:
@@ -4569,13 +5209,11 @@ components:
             message: message
       properties:
         emailId:
+          description: ID of the email validated
           format: uuid
           type: string
         html:
           $ref: '#/components/schemas/HTMLValidationResult'
-      required:
-      - emailId
-      - html
       title: ValidationDto
       type: object
     ValidationMessage:
@@ -4593,6 +5231,9 @@ components:
       title: ValidationMessage
       type: object
     WaitForConditions:
+      description: Conditions that a `waitForXEmails` endpoint operates on. The methods
+        wait until given conditions are met or a timeout is reached. If the conditions
+        are met without needing to wait the results will be returned immediately.
       example:
         sortDirection: ASC
         count: 0
@@ -4609,22 +5250,27 @@ components:
         timeout: 6
       properties:
         count:
-          description: Number of results that should match conditions
+          description: Number of results that should match conditions. Either exactly
+            or at least this amount based on the `countType`. If count condition is
+            not met and the timeout has not been reached the `waitFor` method will
+            retry the operation.
           format: int32
           type: integer
         countType:
-          description: Should exactly count number of results be returned or at least
-            that many.
+          description: How should the found count be compared to the expected count.
           enum:
           - EXACTLY
           - ATLEAST
           type: string
         inboxId:
-          description: Inbox to search within
+          description: ID of inbox to search within and apply conditions to. Essentially
+            filtering the emails found to give a count.
           format: uuid
           type: string
         matches:
-          description: Conditions that should be matched
+          description: Conditions that should be matched for an email to qualify for
+            results. Each condition will be applied in order to each email within
+            an inbox to filter a result list of matching emails you are waiting for.
           items:
             $ref: '#/components/schemas/MatchOption'
           type: array
@@ -4635,11 +5281,16 @@ components:
           - DESC
           type: string
         timeout:
-          description: Max time in milliseconds to wait until conditions are met
+          description: Max time in milliseconds to retry the `waitFor` operation until
+            conditions are met.
           format: int64
           type: integer
         unreadOnly:
-          description: Apply only to unread emails
+          description: 'Apply conditions only to **unread** emails. All emails begin
+            with `read=false`. An email is marked `read=true` when an `EmailDto` representation
+            of it has been returned to the user at least once. For example you have
+            called `getEmail` or `waitForLatestEmail` etc., or you have viewed the
+            email in the dashboard. '
           type: boolean
       title: WaitForConditions
       type: object

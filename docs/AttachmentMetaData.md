@@ -4,10 +4,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ContentLength** | **int64** |  | 
-**ContentType** | **string** |  | 
-**Id** | **string** |  | 
-**Name** | **string** |  | 
+**ContentLength** | **int64** | Size of attachment in bytes | [optional] 
+**ContentType** | **string** | Content type of attachment | [optional] 
+**Id** | **string** | ID of attachment | [optional] 
+**Name** | **string** | Name of attachment | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

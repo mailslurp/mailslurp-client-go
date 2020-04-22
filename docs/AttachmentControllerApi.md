@@ -70,6 +70,7 @@ Name | Type | Description  | Notes
 
  **contentType** | **optional.String**| contentType | 
  **filename** | **optional.String**| filename | 
+ **xFilename** | **optional.String**| x-filename | 
 
 ### Return type
 
