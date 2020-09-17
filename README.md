@@ -1,6 +1,6 @@
 # Go API client for mailslurp
 
-> Requires Go 1.7+. Install with `go get mailslurp/mailslurp-client-go`
+> Requires Go 1.7+. Install with `go get github.com/mailslurp/mailslurp-client-go`
 
 MailSlurp is an API for sending and receiving emails from dynamically allocated email addresses. It's designed for developers and QA teams to test applications, process inbound emails, send templated notifications, attachments, and more. 
 
