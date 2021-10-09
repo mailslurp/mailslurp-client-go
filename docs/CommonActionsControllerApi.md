@@ -1,0 +1,184 @@
+# MailSlurp\CommonActionsControllerApi
+
+All URIs are relative to *https://api.mailslurp.com*
+
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**CreateNewEmailAddress**](CommonActionsControllerApi#CreateNewEmailAddress) | **Post** /createInbox | Create new random inbox
+[**CreateNewEmailAddress1**](CommonActionsControllerApi#CreateNewEmailAddress1) | **Post** /newEmailAddress | Create new random inbox
+[**EmptyInbox**](CommonActionsControllerApi#EmptyInbox) | **Delete** /emptyInbox | Delete all emails in an inbox
+[**SendEmailSimple**](CommonActionsControllerApi#SendEmailSimple) | **Post** /sendEmail | Send an email
+
+
+
+## CreateNewEmailAddress
+
+> Inbox CreateNewEmailAddress(ctx, optional)
+
+Create new random inbox
+
+Returns an Inbox with an `id` and an `emailAddress`
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+ **optional** | ***CreateNewEmailAddressOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a CreateNewEmailAddressOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **allowTeamAccess** | **optional.Bool**| allowTeamAccess | 
+ **description** | **optional.String**| description | 
+ **emailAddress** | **optional.String**| emailAddress | 
+ **expiresAt** | **optional.Time**| expiresAt | 
+ **expiresIn** | **optional.Int64**| expiresIn | 
+ **favourite** | **optional.Bool**| favourite | 
+ **inboxType** | **optional.String**| inboxType | 
+ **name** | **optional.String**| name | 
+ **tags** | [**optional.Interface of []string**](string)| tags | 
+ **useDomainPool** | **optional.Bool**| useDomainPool | 
+
+### Return type
+
+[**Inbox**](Inbox)
+
+### Authorization
+
+[API_KEY](../README#API_KEY)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README#documentation-for-api-endpoints)
+[[Back to Model list]](../README#documentation-for-models)
+[[Back to README]](../README)
+
+
+## CreateNewEmailAddress1
+
+> Inbox CreateNewEmailAddress1(ctx, optional)
+
+Create new random inbox
+
+Returns an Inbox with an `id` and an `emailAddress`
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+ **optional** | ***CreateNewEmailAddress1Opts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a CreateNewEmailAddress1Opts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **allowTeamAccess** | **optional.Bool**| allowTeamAccess | 
+ **description** | **optional.String**| description | 
+ **emailAddress** | **optional.String**| emailAddress | 
+ **expiresAt** | **optional.Time**| expiresAt | 
+ **expiresIn** | **optional.Int64**| expiresIn | 
+ **favourite** | **optional.Bool**| favourite | 
+ **inboxType** | **optional.String**| inboxType | 
+ **name** | **optional.String**| name | 
+ **tags** | [**optional.Interface of []string**](string)| tags | 
+ **useDomainPool** | **optional.Bool**| useDomainPool | 
+
+### Return type
+
+[**Inbox**](Inbox)
+
+### Authorization
+
+[API_KEY](../README#API_KEY)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README#documentation-for-api-endpoints)
+[[Back to Model list]](../README#documentation-for-models)
+[[Back to README]](../README)
+
+
+## EmptyInbox
+
+> EmptyInbox(ctx, inboxId)
+
+Delete all emails in an inbox
+
+Deletes all emails
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**inboxId** | [**string**]()| inboxId | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+[API_KEY](../README#API_KEY)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README#documentation-for-api-endpoints)
+[[Back to Model list]](../README#documentation-for-models)
+[[Back to README]](../README)
+
+
+## SendEmailSimple
+
+> SendEmailSimple(ctx, emailOptions)
+
+Send an email
+
+If no senderId or inboxId provided a random email address will be used to send from.
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**emailOptions** | [**SimpleSendEmailOptions**](SimpleSendEmailOptions)| emailOptions | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+[API_KEY](../README#API_KEY)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README#documentation-for-api-endpoints)
+[[Back to Model list]](../README#documentation-for-models)
+[[Back to README]](../README)
+
